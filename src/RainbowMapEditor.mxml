@@ -21,7 +21,7 @@
 				<menuitem id="SubMenu2_3" label="关于(A)" type="radio" groupName="two"/>
 			</menuitem>
 			<menuitem id="menu3" label="窗口(W)">
-				<menuitem id="SubMenu3_1" label="全局(E)" type="check" select/>
+				<menuitem id="SubMenu3_1" label="全局(E)" type="check"/>
 				<menuitem id="SubMenu3_3" label="层级(L)" type="check" groupName="two"/>
 				<menuitem id="SubMenu3_2" label="事件(E)" type="check"/>
 				<menuitem id="SubMenu3_3" label="素材(L)" type="check" groupName="two"/>

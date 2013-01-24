@@ -1,0 +1,1789 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml"
+						width="1000"
+						height="700"
+						layout="absolute"
+						creationComplete="onInit()"
+						xmlns:view="com.yxg.mapedite.view.*">
+	<mx:Style source="style/style.css">
+	</mx:Style>
+
+	<mx:Script>
+		<![CDATA[
+			import com.yxg.mapedite.staticvo.MapEditeType;
+			import com.yxg.mapedite.view.WinLoaderInfo;
+			import json.JSON;
+			import com.yxg.utils.HashMap;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ChildExistenceChangedEvent;
+			import mx.containers.Canvas;
+			import mx.controls.Text;
+			import mx.events.MenuEvent;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.collections.*;
+
+			import mx.core.UIComponent;
+			import mx.core.DragSource;
+			import mx.events.DragEvent;
+			import mx.managers.DragManager;
+
+			import mx.managers.PopUpManager;
+
+			import flash.filesystem.*;
+			import flash.events.Event;
+
+			import com.cypl.utils.FindPathX;
+			import com.yxg.mapedite.model.MapEditeModel;
+			import com.yxg.mapedite.vo.MaskTypeVo;
+			import com.yxg.mapedite.control.KeyManager;
+			import com.yxg.mapedite.control.Controller;
+			import com.cypl.utils.MapUtils;
+
+			private var _menubarXML:XMLList=
+				<>
+					<menuitem label="文件" data="top">
+						<menuitem label="新建地图" data="1A"/>
+						<menuitem type="separator"/>
+						<menuitem label="打开地图工程" data="1B"/>
+						<menuitem type="separator"/>
+						<menuitem label="保存地图工程" data="1C"/>
+						<menuitem type="separator"/>
+						<menuitem label="退出" data="1C"/>
+					</menuitem>
+					<menuitem label="帮助" data="top">
+						<menuitem label="帮助" data="2A"/>
+						<menuitem label="访问">
+							<menuitem label="游戏谷" data="2B_1"/>
+							<menuitem label="游戏谷论坛" data="2B_2"/>
+						</menuitem>
+						<menuitem label="关于" data="2C"/>
+					</menuitem>
+				</>
+				;
+
+			private var loader:Loader;
+
+			private var myW:int;
+			private var myH:int;
+
+			private var tileW:int;
+			private var tileH:int;
+
+			private var _WLI:WinLoaderInfo;
+
+			private var arrMap:Array;
+
+			private var oldX:int=-1;
+			private var oldY:int=-1;
+
+			private var myTimer:Timer;
+
+			private var myType:Number=-1;
+
+
+			//行 高 Y
+			private var row:int;
+			//列 宽 X
+			private var column:int;
+
+			//网格SP
+			private var _spGrid:Sprite;
+
+			//------------------------------
+
+			private var _strMapData:String;
+
+			private var _blnDrawBlock:Boolean;
+
+
+			private var _strMapName:String;
+
+			[Bindable]
+			public var _menuBarCollection:XMLListCollection;
+
+			//主地图载入完成
+			private var _blnLoadMapFinsh:Boolean;
+
+			private var _tmpDs:DragSource;
+
+
+			//素材容器目前高度
+			private var _ObjContainerH:int;
+
+			//地图编辑器模式
+			private var _mapEditorType:String;
+
+
+			//临时拖拽过程中的临时图片
+			private var _tmpImage:Image;
+
+			//在物件拖拽过程中
+			private var _blnOnObjectDrag:Boolean;
+
+			//最后拖拽对象
+			private var _lastObj:Image;
+			//最后拖拽相对位置
+			private var _lastObjPoint:Point;
+
+			//最后物件文件名
+			private var _lastObjFileName:String;
+
+			//物件库HashMap
+			private var _hmObj:HashMap;
+
+			//物件放置后HashMap
+			private var _arrObjSpace:Array;
+
+			//物件索引
+			private var _numObjPK:int;
+
+			protected function onInit():void
+			{
+				this.addChild(KeyManager.getInstance());
+
+				// TODO Auto-generated method stub
+				_alertButton.addEventListener(MouseEvent.MOUSE_UP, showAlert);
+
+				//_loadMapInfoButton.addEventListener(MouseEvent.MOUSE_UP,loadMapInfo);
+
+				_testButton.addEventListener(MouseEvent.MOUSE_UP, btnEHandler);
+
+				_testButton0.addEventListener(MouseEvent.MOUSE_UP, btnEHandler0);
+
+				IndexChangedEvent;
+
+				_tabNav.addEventListener(IndexChangedEvent.CHANGE, indexChangeHandler);
+
+				initMenuBar();
+				initData();
+
+
+				//test 用于测试MapUtil的工作情况
+				var sourcText:String = "1-0-0-3-3-3-3-3-64-64-64-7-7-0,0-1-1-3-3-3-3-3-64-64-64-0-0-0,0-0-0-3-3-3-3-3-6-6-6-0-0-0,0-0-0-3-3-3-3-3-6-6-6-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0";
+				trace("source txt is : " + sourcText);
+				trace("result arr is : " + MapUtils.getMapInfoArr(sourcText));
+				trace("result str is : " + MapUtils.getMapInfoString(sourcText));
+			}
+			private function initData():void
+			{
+				myW=0;
+				myH=0;
+				tileW=0;
+				tileH=0;
+				arrMap=new Array();
+
+				_blnDrawBlock=false;
+
+				_blnLoadMapFinsh=false;
+				_ObjContainerH=0;
+
+				_mapEditorType=MapEditeType.EDIT_VIEW;
+
+				_blnOnObjectDrag=false;
+
+				_hmObj=new HashMap();
+
+				_arrObjSpace=new Array();
+
+				_numObjPK=0;
+			}
+
+			private function showAlert(e:MouseEvent):void
+			{
+				_txtInfo.text+="测试保存" + "\n";
+				Alert.show("测试保存！", "提示");
+				var myText:Text=new Text();
+				myText.x=200;
+				myText.y=20;
+				this.addChild(myText);
+				var myWLI:WinLoaderInfo=new WinLoaderInfo();
+				myWLI.loginName=myText;
+				PopUpManager.addPopUp(myWLI, this, true);
+			}
+
+			//读取地图阻挡信息
+			private function loadMapInfo(e:MouseEvent):void
+			{
+				var fileForOpen:File=new File();
+				try
+				{
+					var txtFilter:FileFilter=new FileFilter("MapData(*.txt)", "*.txt");
+					//fileForOpen = File.applicationStorageDirectory;
+					fileForOpen.browseForOpen("open", [txtFilter]);
+					//fileForOpen.resolvePath("images/");
+					//fileForOpen.addEventListener(Event.SELECT,selectFileHandler2);
+					fileForOpen.addEventListener(Event.SELECT, selectFileHandler2);
+					//fileForOpen.addEventListener(Event.OPEN,selectFileHandler);
+				}
+				catch (error:Error)
+				{
+					_txtInfo.text+="打开错误:97" + "\n";
+					trace("Failed:" + error.message);
+				}
+			}
+
+			//显示地图阻挡信息
+			private function showMapInfo(e:MouseEvent):void
+			{
+				_txtMapInfo.text=arrMap.toString();
+				_txtMapInfo.text+="\n showIt";
+
+			}
+
+			//保存二进制地图信息
+			private function saveByte(e:MouseEvent):void
+			{
+				//_strMapName
+
+				trace("准备写地图二进制文件");
+				_txtInfo.text+="准备写地图二进制文件\n";
+
+				var docsDir:File=File.documentsDirectory;
+				try
+				{
+					docsDir.browseForSave("Save As");
+					docsDir.addEventListener(Event.SELECT, saveByteData);
+				}
+				catch (error:Error)
+				{
+					trace("Failed:", error.message);
+				}
+			}
+
+			private function saveByteData(e:Event):void
+			{
+				var newFile:File=e.target as File;
+				var str:String="Hello.";
+				if (!newFile.exists)
+				{
+					var stream:FileStream=new FileStream();
+					stream.open(newFile, FileMode.WRITE);
+					//stream.writeUTFBytes(str);
+
+					var myByte:ByteArray=new ByteArray();
+					myByte.endian=Endian.LITTLE_ENDIAN;
+					//四位8字节
+					/*myByte.writeInt(255);
+					   myByte.writeInt(255);
+					   myByte.writeInt(1);
+					   myByte.writeInt(0);
+					 myByte.writeInt(1);*/
+
+
+					trace(arrMap.length);
+
+					for (var i:int=0; i < arrMap.length; i++)
+					{
+						for (var j:int=0; j < arrMap[i].length; j++)
+						{
+							//trace(arrMap[i][j]);
+							_txtMapInfo.text+=arrMap[i][j] + "_";
+
+							/*switch(arrMap[i][j]){
+							   case 0:
+							   myByte.writeInt(0);
+							   break;
+							   case 1:
+							   myByte.writeInt(1);
+							   break;
+							   case 2:
+							   myByte.writeInt(64);
+							   break;
+							   default:
+							   myByte.writeInt(0);
+
+							 }*/
+							//hao ， 将当前地图数组数据以二进制的方式写入文件
+							myByte.writeInt(arrMap[i][j]);
+						}
+						_txtMapInfo.text+=",\n";
+					}
+
+
+					stream.writeBytes(myByte);
+					stream.close();
+
+					_txtInfo.text+="文件保存完毕！\n";
+
+						//位置和朝向
+						//OBJ
+						//scene
+						//怪物
+						//AI
+
+				}
+				else
+				{
+					_txtInfo.text+="文件存在禁止保存！\n";
+				}
+			}
+
+			//保存字符串地图信息
+			private function saveString(e:MouseEvent):void
+			{
+				trace("准备写地图字符串文件");
+				_txtInfo.text+="准备写地图字符串文件\n";
+
+				var docsDir:File=File.documentsDirectory;
+				try
+				{
+					docsDir.browseForSave("Save As");
+					docsDir.addEventListener(Event.SELECT, saveStringData);
+				}
+				catch (error:Error)
+				{
+					trace("Failed:", error.message);
+				}
+			}
+
+			private function saveStringData(e:Event):void
+			{
+				var newFile:File=e.target as File;
+				var str:String="Hello.";
+				if (!newFile.exists)
+				{
+					var stream:FileStream=new FileStream();
+					stream.open(newFile, FileMode.WRITE);
+					//stream.writeUTFBytes(str);
+
+
+					var myStr:String="";
+
+					//var myByte:ByteArray=new ByteArray();
+					//myByte.endian=Endian.LITTLE_ENDIAN;
+					//四位8字节
+					/*myByte.writeInt(255);
+					   myByte.writeInt(255);
+					   myByte.writeInt(1);
+					   myByte.writeInt(0);
+					 myByte.writeInt(1);*/
+
+
+					trace(arrMap.length);
+
+					for (var i:int=0; i < arrMap.length; i++)
+					{
+						myStr="";
+						for (var j:int=0; j < arrMap[i].length; j++)
+						{
+							//trace(arrMap[i][j]);
+							_txtMapInfo.text+=arrMap[i][j] + "-";
+
+							myStr+=arrMap[i][j] + "-";
+
+							/*switch(arrMap[i][j]){
+							   case 0:
+							   myStr+="0,";
+							   break;
+							   case 1:
+							   myStr+="1,";
+							   break;
+							   case 2:
+							   myStr+="40,";
+							   break;
+							   default:
+							   myStr+="0,";
+							 }*/
+						}
+						//换行
+						myStr=myStr.substr(0, myStr.length - 1);
+						myStr+=",";
+
+
+						_txtMapInfo.text+=",\n";
+
+						if (i == arrMap.length - 1)
+						{
+							trace("try i = " + i);
+							myStr=myStr.slice(0, myStr.length - 1);
+							stream.writeUTFBytes(myStr);
+						}
+						else
+						{
+							trace("try M = " + i);
+							stream.writeUTFBytes(myStr + "\r\n");
+						}
+					}
+
+
+
+					//stream.writeBytes(myByte);
+					stream.close();
+
+					_txtInfo.text+="文件保存完毕！\n";
+
+						//位置和朝向
+						//OBJ
+						//scene
+						//怪物
+						//AI
+
+				}
+				else
+				{
+					_txtInfo.text+="文件存在禁止保存！\n";
+				}
+			}
+
+			//读取地图数据
+			private function selectFileHandler2(e:Event):void
+			{
+				var fileStream:FileStream=new FileStream();
+				fileStream.open(File(e.target), FileMode.READ);
+				_strMapData=fileStream.readUTFBytes(fileStream.bytesAvailable); //只读方式打开文件
+				//_txtInfo.text=_strMapData;
+				_txtInfo.text+="地图数据读取成功\n";
+				fileStream.close();
+				trace("地图数据读取成功");
+				btnDHandler();
+			}
+
+			private function initMenuBar():void
+			{
+				_menuBarCollection=new XMLListCollection(_menubarXML);
+				//_menuBar.dataProvider=_menuBarCollection;
+			}
+
+			private function menuHandler(event:MenuEvent):void
+			{
+				// Don't open the Alert for a menu bar item that 
+				// opens a popup submenu.
+				if (event.item.@data != "top")
+				{
+					if (event.item.@data == "1A")
+					{
+						var fileForOpen:File=new File();
+						try
+						{
+							var txtFilter:FileFilter=new FileFilter("Image(*.jpg;*.jpeg;*.gif;*.png;*.bmp)", "*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+							//fileForOpen = File.applicationStorageDirectory;
+							fileForOpen.browseForOpen("打开图片", [txtFilter]);
+							//fileForOpen.resolvePath("images/");
+							fileForOpen.addEventListener(Event.SELECT, selectFileHandler);
+							//fileForOpen.addEventListener(Event.OPEN,selectFileHandler);
+						}
+						catch (error:Error)
+						{
+							_txtInfo.text+="打开错误" + "\n";
+							trace("Failed:" + error.message);
+						}
+							//Alert.show("创建地图","提示");
+							//_swfLoader.load();
+					}
+					if (event.item.@data == "1C")
+					{
+						application.exit();
+					}
+					if (event.item.@data == "2B_1")
+					{
+						var fRequest1:URLRequest=new URLRequest("http://www.youxigu.com");
+						navigateToURL(fRequest1);
+					}
+					if (event.item.@data == "2B_2")
+					{
+						var fRequest2:URLRequest=new URLRequest("http://bbs.youxigu.com");
+						navigateToURL(fRequest2);
+					}
+					if (event.item.@data == "2C")
+					{
+						Alert.show("游戏谷 - 星火工作室\ncopyright 2009\nAuthor:JonasXie", "信息");
+					}
+						//Alert.show("Label: " + event.item.@label + "\n" + "Data: " + event.item.@data, "Clicked menu item");
+				}
+			}
+
+			private function selectFileHandler(e:Event):void
+			{
+				trace(File(e.target).url);
+				_WLI=new WinLoaderInfo();
+				PopUpManager.addPopUp(_WLI, this, true);
+				loader=new Loader();
+				loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onProgressHandler);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderHandler);
+
+
+				loader.load(new URLRequest(File(e.target).url));
+
+			}
+
+			private function onProgressHandler(e:ProgressEvent):void
+			{
+				//private function onProgressHandler(...args):void{
+				//trace(e.bytesLoaded);
+				_WLI._loaderProgress.setProgress(Math.floor((e.bytesLoaded / e.bytesTotal) * 100), 100);
+			}
+
+			private function onLoaderHandler(e:Event):void
+			{
+				PopUpManager.removePopUp(_WLI);
+				_txtInfo.text+="新建完成" + "\n";
+				Alert.show("地图新建成功！", "提示");
+
+				_blnLoadMapFinsh=true;
+
+				myW=(loader.content).width;
+				myH=(loader.content).height;
+				_Image.width=myW;
+				_Image.height=myH;
+				_Image.source=loader.content;
+				DrawGrid(_panImage);
+				_cvGrid.mouseEnabled=false;
+				_cvGrid.mouseChildren=false;
+				_Image.addEventListener(MouseEvent.MOUSE_DOWN, checkStart);
+				_Image.addEventListener(MouseEvent.MOUSE_UP, checkStop);
+
+				_cvObject.width=myW;
+				_cvObject.height=myH;
+
+
+				//开启容器鼠标事件
+				var fsp:Sprite=new Sprite();
+
+				fsp.graphics.beginFill(0x6699FF, 0.5);
+
+				fsp.graphics.drawRect(0, 0, myW, myH);
+
+				fsp.graphics.endFill();
+
+				_cvObject.rawChildren.addChild(fsp);
+
+				_cvObject.buttonMode=false;
+				_cvObject.mouseChildren=false;
+				_cvObject.mouseEnabled=false;
+				trace("7");
+
+				trace("_cvObject.width " + _cvObject.width + " _cvObject.height " + _cvObject.height);
+			}
+
+
+			private function DrawGrid(iPhoto:Panel):void
+			{
+				//var fSp:Sprite=new Sprite();
+				_spGrid=new Sprite();
+				//高
+				row=Math.floor(myH / int(_gridH.text));
+				//宽
+				column=Math.floor(myW / int(_gridW.text));
+				var i:int;
+				var j:int;
+				var mX:int;
+				var mY:int;
+				_txtInfo.text+="row " + row + " column " + column + "\n";
+				trace("row " + row + " column " + column);
+
+				_strMapName=String("MapInfo_" + row + "_" + column);
+
+				//var arrMap:Array=new Array();
+				for (mY=0; mY < row; mY++)
+				{
+					arrMap.push(new Array());
+					for (mX=0; mX < column; mX++)
+					{
+						arrMap[mY][mX]=0;
+					}
+				}
+				var color:uint=0x000000;
+				for (i=0; i < row; i++)
+				{
+					_spGrid.graphics.lineStyle(1, color, 0.8);
+					_spGrid.graphics.moveTo(0, i * int(_gridH.text));
+					_spGrid.graphics.lineTo(myW, i * int(_gridH.text));
+				}
+				for (j=0; j < column; j++)
+				{
+					_spGrid.graphics.lineStyle(1, color, 0.8);
+					_spGrid.graphics.moveTo(j * int(_gridW.text), 0);
+					_spGrid.graphics.lineTo(j * int(_gridW.text), myH);
+				}
+				while (_cvGrid.rawChildren.numChildren > 0)
+				{
+					if (_cvGrid.rawChildren.getChildAt(0) is Sprite)
+					{
+						Sprite(_cvGrid.rawChildren.getChildAt(0)).graphics.clear();
+						_cvGrid.rawChildren.removeChildAt(0);
+					}
+				}
+				_cvGrid.rawChildren.addChild(_spGrid);
+			}
+
+			//绘制网格
+			private function drawTile():void
+			{
+				//_Image.addChild();
+			}
+
+
+			//显示事件层
+			private function showEventLayer():void
+			{
+				if (_cb_1.selected)
+				{
+					trace("yes");
+				}
+				else
+				{
+					trace("no");
+				}
+			}
+
+			//显示对象层
+			private function showObjectLayer():void
+			{
+				if (_cb_2.selected)
+				{
+					trace("yes");
+					_cvObject.visible=true;
+				}
+				else
+				{
+					trace("no");
+					_cvObject.visible=false;
+				}
+			}
+
+			//显示网格层
+			private function showGridLayer():void
+			{
+				if (_cb_3.selected)
+				{
+					trace("yes");
+					_cvGrid.visible=true;
+				}
+				else
+				{
+					trace("no");
+					_cvGrid.visible=false;
+				}
+			}
+
+			//载入时绘制阻挡
+			private function onLoaddrawBlock():void
+			{
+				if (_drawBlock.selected)
+				{
+					_blnDrawBlock=true;
+				}
+				else
+				{
+					_blnDrawBlock=false;
+				}
+			}
+
+			//显示背景图
+			private function showBackGround():void
+			{
+				if (_cb_4.selected)
+				{
+					trace("yes");
+					_Image.visible=true;
+				}
+				else
+				{
+					trace("no");
+					_Image.visible=false;
+				}
+			}
+
+			//------------------------------
+
+			private function showStr():String
+			{
+				var fStr:String="";
+				for (var i:int=0; i < arrMap.length; i++)
+				{
+					fStr+=String(arrMap[i].join("-")) + ",";
+				}
+				fStr=fStr.substr(0, fStr.length - 1);
+				return fStr;
+			}
+
+			private function showArr():Array
+			{
+				return arrMap;
+			}
+
+			//重绘数据
+			private var arrReDraw:Array=new Array();
+
+			private function reDrawMap(arr:Array, bln:Boolean):void
+			{
+				_txtInfo.text+="reDrawMap " + "\n";
+				trace("reDrawMap");
+				arrMap=new Array();
+				var mX:int;
+				var mY:int;
+				for (mY=0; mY < arr.length; mY++)
+				{
+					arrMap.push(new Array());
+					for (mX=0; mX < arr[mY].length; mX++)
+					{
+						arrMap[mY][mX]=arr[mY][mX];
+					}
+				}
+				if (bln)
+				{
+					arrReDraw=new Array();
+					for (var j:Number=0; j < arrMap.length; j++)
+					{
+						for (var i:Number=0; i < arrMap[j].length; i++)
+						{
+							//drawBox(i,j,arrMap[j][i]);
+							arrReDraw.push(new Array(i, j, arrMap[j][i]));
+						}
+					}
+					var drawBoxTimer:Timer=new Timer(1);
+					drawBoxTimer.addEventListener(TimerEvent.TIMER, runTimer);
+					drawBoxTimer.start();
+				}
+			}
+
+			private function runTimer(e:TimerEvent):void
+			{
+				if (arrReDraw.length > 0)
+				{
+					var fArr:Array=new Array();
+					fArr=arrReDraw.shift();
+					drawBox(fArr[0], fArr[1], fArr[2]);
+				}
+				else
+				{
+					Timer(e.target).stop();
+					trace("绘制完毕");
+					_txtInfo.text+="绘制完毕";
+				}
+			}
+
+			private function checkStart(e:MouseEvent):void
+			{
+				MapEditeModel.getInstance().maskAreaStartPoint=null;
+				MapEditeModel.getInstance().maskAreaEndPoint=null;
+				if (KeyManager.getInstance().isControlDown)
+				{
+					//hao 当用户按住ctrl的时候显示当前的隐藏状态
+					var fx:Number=e.target.mouseX;
+					var fy:Number=e.target.mouseY;
+					var fxx:int=Math.floor(fx / int(_gridW.text));
+					var fyy:int=Math.floor(fy / int(_gridH.text));
+					MapEditeModel.getInstance().currentMaskType.typeValue=arrMap[fyy][fxx];
+					Controller.getInstance().dispatchEvent(new Event(Controller.Event_Refresh_Mask_By_View));
+				}
+				else if (KeyManager.getInstance().isShiftDown)
+				{
+					//hao 当用户按下shift键时，我们允许用户绘制一个矩形选择区域的遮挡
+					MapEditeModel.getInstance().maskAreaStartPoint=[e.target.mouseX, e.target.mouseY];
+					e.target.addEventListener(MouseEvent.MOUSE_MOVE, myClickHandler);
+				}
+				else
+				{
+					trace("start");
+					e.target.addEventListener(MouseEvent.MOUSE_MOVE, myClickHandler);
+				}
+			}
+
+			private function checkStop(e:MouseEvent):void
+			{
+				trace("stop");
+				trace("_blnOnObjectDrag1 = " + _blnOnObjectDrag);
+				/*if (_blnOnObjectDrag){
+				   trace("真实位置 x "+_Image.mouseX+" y "+_Image.mouseY);
+
+
+
+
+				   _lastObj.x=_Image.mouseX-_lastObjPoint.x;
+
+				   _lastObj.y=_Image.mouseY-_lastObjPoint.y;
+
+				   trace("!!!000 _lastObj x "+_Image.mouseX+" y "+_Image.mouseY);
+
+
+				   trace("!!!!!! _lastObj x "+_lastObj.x+" y "+_lastObj.y);
+
+				   _blnOnObjectDrag=false;
+				 }*/
+				e.target.removeEventListener(MouseEvent.MOUSE_MOVE, myClickHandler);
+			}
+
+			/**
+			 * hao
+			 * 设置区域遮罩
+			 */
+			private function setAreaMask():void
+			{
+				var startPoint:Array=MapEditeModel.getInstance().maskAreaStartPoint;
+				var endPoint:Array=MapEditeModel.getInstance().maskAreaEndPoint;
+				if (null != startPoint && null != endPoint)
+				{
+					var startX:int=Math.floor(startPoint[0] / int(_gridW.text));
+					var startY:int=Math.floor(startPoint[1] / int(_gridH.text));
+
+					var endX:int=Math.floor(endPoint[0] / int(_gridW.text));
+					var endY:int=Math.floor(endPoint[1] / int(_gridW.text));
+
+					//起始点标示应该比尾点标示小
+					//这里对起始标示和尾表示做调整
+					var lastStartX:int=(startX < endX) ? startX : endX;
+					var lastEndX:int=(startX > endX) ? startX : endX;
+
+					var lastStartY:int=(startY < endY) ? startY : endY;
+					var lastEndY:int=(startY > endY) ? startY : endY;
+
+
+					for (var yIndex:int=lastStartY; yIndex <= lastEndY; yIndex++)
+					{
+						for (var xIndex:int=lastStartX; xIndex <= lastEndX; xIndex++)
+						{
+							//hao
+							if(yIndex < arrMap.length && xIndex < arrMap[0].length){
+								arrMap[yIndex][xIndex]=MapEditeModel.getInstance().currentMaskType.typeValue;
+								drawBox(xIndex, yIndex, MapEditeModel.getInstance().currentMaskType.typeValue);	
+							}
+						}
+					}
+				}
+			}
+
+			private function myClickHandler(e:MouseEvent):void
+			{
+				//trace("_blnOnObjectDrag2 = "+_blnOnObjectDrag);
+
+				if (_mapEditorType == MapEditeType.EDIT_GRID)
+				{
+					//检测是否以区域的方式绘制
+					if (null != MapEditeModel.getInstance().maskAreaStartPoint)
+					{
+						MapEditeModel.getInstance().maskAreaEndPoint=[e.target.mouseX, e.target.mouseY];
+						setAreaMask();
+					}
+					else
+					{
+						showGrid(e.target.mouseX, e.target.mouseY);
+					}
+				}
+			}
+
+			private function showGrid(fx:int, fy:int):void
+			{
+				var fxx:int=Math.floor(fx / int(_gridW.text));
+				var fyy:int=Math.floor(fy / int(_gridH.text));
+				if (oldX == fxx && oldY == fyy)
+				{
+				}
+				else
+				{
+					oldX=fxx;
+					oldY=fyy;
+					/*if (myType==-1) {
+					   if (arrMap[fyy][fxx]==0) {
+					   arrMap[fyy][fxx]=1;
+					   } else if (arrMap[fyy][fxx]==1) {
+					   arrMap[fyy][fxx]=2;
+					   } else if (arrMap[fyy][fxx]==2) {
+					   arrMap[fyy][fxx]=0;
+					   }
+					   } else {
+					   arrMap[fyy][fxx]=myType;
+					 }*/
+					//hao
+					//将遮罩类型保存为当前选中的遮罩类型
+					if(fyy<arrMap.length && fxx < arrMap[0].length){
+						arrMap[fyy][fxx] = MapEditeModel.getInstance().currentMaskType.typeValue;
+						//trace(fxx,fyy);
+						drawBox(fxx, fyy, arrMap[fyy][fxx]);	
+					}
+				}
+			}
+
+
+			private function drawBox(fx:int, fy:int, fint:int):void
+			{
+				if (_spGrid.getChildByName("btn" + fx + "-" + fy) != null)
+				{
+					Sprite(_spGrid.getChildByName("btn" + fx + "-" + fy)).graphics.clear();
+					_spGrid.removeChild(_spGrid.getChildByName("btn" + fx + "-" + fy));
+				}
+				var fSp:Sprite=new Sprite();
+				fSp.x=fx * int(_gridW.text);
+				fSp.y=fy * int(_gridH.text);
+				fSp.name="btn" + fx + "-" + fy;
+				if (fint == 1)
+				{
+					fSp.graphics.beginFill(0xFF0000, 0.5);
+					fSp.graphics.drawRect(0, 0, int(_gridW.text), int(_gridH.text));
+					fSp.graphics.endFill();
+				}
+				else if (fint == 64)
+				{
+					fSp.graphics.beginFill(0x0000FF, 0.5);
+					fSp.graphics.drawRect(0, 0, int(_gridW.text), int(_gridH.text));
+					fSp.graphics.endFill();
+				}
+				//show Path
+				else if (fint == 9)
+				{
+					fSp.graphics.beginFill(0x00FF00, 0.5);
+					fSp.graphics.drawRect(0, 0, int(_gridW.text), int(_gridH.text));
+					fSp.graphics.endFill();
+				}
+				else if (0 != fint)
+				{
+					fSp.graphics.beginFill(0xFFFF00, 0.5);
+					fSp.graphics.drawRect(0, 0, int(_gridW.text), int(_gridH.text));
+					fSp.graphics.endFill();
+					var textfiled:TextField=new TextField();
+					textfiled.text=fint.toString(16);
+					textfiled.autoSize="left";
+					fSp.addChild(textfiled);
+				}
+
+				fSp.mouseEnabled=false;
+				fSp.mouseChildren=false;
+
+				_spGrid.addChild(fSp);
+			}
+
+			private function Test():void
+			{
+				trace("test.........." + myType);
+			}
+
+
+			private function showPath(arr:Array):void
+			{
+				for (var i:int=0; i < arr.length; i++)
+				{
+					drawBox(Math.floor(arr[i] % column), Math.floor(arr[i] / column), 9);
+				}
+			}
+
+
+			//-----操作---------------------------------------------
+			import flash.system.System;
+			import flash.geom.Point;
+
+			import com.cypl.utils.FindPathX;
+
+			private var myObj:Object=new Object();
+
+			private var fpX:FindPathX;
+
+			//myScrollPane.addEventListener(Event.COMPLETE,runit);
+
+			private function runit(e:Event):void
+			{
+				//trace("runit + --------");
+				myObj=e.target.content;
+				//trace(myObj);
+				//trace(myObj.numChildren);
+			}
+
+			//rdoA.group.addEventListener(Event.CHANGE, radioChangeHandler);
+			//rdoB.group.addEventListener(Event.CHANGE, radioChangeHandler);
+			//rdoC.group.addEventListener(Event.CHANGE, radioChangeHandler);
+			//rdoD.group.addEventListener(Event.CHANGE, radioChangeHandler);
+			private function radioChangeHandler(e:Event):void
+			{
+				//var rbg:RadioButtonGroup = e.target as RadioButtonGroup;
+
+				//myObj.myType=Number(rbg.selectedData);
+				//myObj.Test();
+			}
+
+			//btnB.addEventListener(MouseEvent.CLICK,btnBHandler);
+			private function btnBHandler(e:MouseEvent):void
+			{
+				//txA.text=myObj.showStr();
+			}
+
+			//btnC.addEventListener(MouseEvent.CLICK,btnCHandler);
+			private function btnCHandler(e:MouseEvent):void
+			{
+				//System.setClipboard(String(txA.text));
+			}
+
+			//btnD.addEventListener(MouseEvent.CLICK,btnDHandler);
+
+			//字符数据转数组 并绘制
+			private function btnDHandler(... args):void
+			{
+				var fArr:Array=new Array();
+				var fArr2:Array=new Array();
+				//fArr=String(txA.text).split(",");
+				fArr=String(_strMapData).split(",");
+
+				//trace(fArr.length);
+				for (var j:Number=0; j < fArr.length; j++)
+				{
+					fArr2.push(new Array());
+					var myArr3:Array=new Array();
+					myArr3=String(fArr[j]).split("-");
+					for (var i:Number=0; i < myArr3.length; i++)
+					{
+						fArr2[j].push(int(myArr3[i]));
+					}
+				}
+				//绘制
+				//this.reDrawMap(fArr2,true);
+				//不绘制
+				this.reDrawMap(fArr2, _blnDrawBlock);
+				return;
+			}
+
+			//btnE.addEventListener(MouseEvent.CLICK,btnEHandler);
+			private function btnEHandler(e:MouseEvent):void
+			{
+				trace("btnE");
+				var fArr:Array=new Array();
+				var fArr2:Array=new Array();
+				fArr2=showArr();
+				//trace(fArr2.length);
+				//trace(fArr2[0].length);
+				for (var m:int=0; m < fArr2.length; m++)
+				{
+					fArr.push(new Array());
+					for (var k:int=0; k < fArr2[m].length; k++)
+					{
+						fArr[m].push(fArr2[m][k]);
+					}
+				}
+				for (var j:int=0; j < fArr.length; j++)
+				{
+					for (var i:int=0; i < fArr[j].length; i++)
+					{
+						if (MapUtils.isSTATICBLOCK(fArr[j][i]))
+						{
+							fArr[j][i]=1;
+						}
+						else{
+							fArr[j][i]=0;
+						}
+					}
+				}
+				var myTimer:int=getTimer();
+				fpX=new FindPathX(fArr);
+				var myTemp:Object=fpX.getPath8(new Point(1, 1), new Point(7, 7));
+				//var myTemp:Object=fpX.getPath8(new Point(1,22),new Point(20,22));
+				//var myTemp:Object=fpX.getPath8(new Point(1,22),new Point(57,56));
+				//var myTemp=fpX.getPath8(new Point(0,0),new Point(24,17));
+				trace("myTemp" + myTemp);
+				trace("所搜耗时 " + String(getTimer() - myTimer) + " 毫秒");
+				//trace(myTemp);
+				//myObj.showPath(new Array(0,1,2,3,31,41,51));
+				if (myTemp != null)
+				{
+					if (myTemp is Array)
+					{
+						var fArr3:Array=new Array();
+						fArr3=myTemp.toString().split(",");
+						showPath(fArr3);
+					}
+				}
+				else
+				{
+					trace("查找失败");
+				}
+			}
+
+
+			private function btnEHandler0(e:MouseEvent):void
+			{
+				trace("读写二进制文件");
+				_txtInfo.text+="读写二进制文件\n";
+
+				var docsDir:File=File.documentsDirectory;
+				try
+				{
+					docsDir.browseForSave("Save As");
+					docsDir.addEventListener(Event.SELECT, saveData);
+				}
+				catch (error:Error)
+				{
+					trace("Failed:", error.message);
+				}
+			}
+
+			private function saveData(event:Event):void
+			{
+				var newFile:File=event.target as File;
+				var str:String="Hello.";
+				if (!newFile.exists)
+				{
+					var stream:FileStream=new FileStream();
+					stream.open(newFile, FileMode.WRITE);
+					//stream.writeUTFBytes(str);
+
+					var myByte:ByteArray=new ByteArray();
+					//单字节
+					myByte.writeByte(10);
+					//双字节
+					//myByte.writeShort(10);
+					myByte.writeByte(22);
+					stream.writeBytes(myByte);
+					stream.close();
+
+						//位置和朝向
+						//OBJ
+						//scene
+						//怪物
+						//AI
+
+				}
+				else
+				{
+					_txtInfo.text+="文件存在！\n";
+				}
+			}
+
+
+			//导入素材
+			private function addAsset():void
+			{
+				var fileForOpen:File=new File();
+				try
+				{
+					var txtFilter:FileFilter=new FileFilter("Image(*.jpg;*.jpeg;*.gif;*.png;*.bmp)", "*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+					fileForOpen.browseForOpen("打开图片", [txtFilter]);
+					fileForOpen.addEventListener(Event.SELECT, selectGifHandler);
+				}
+				catch (error:Error)
+				{
+					_txtInfo.text+="打开错误" + "\n";
+					trace("Failed:" + error.message);
+				}
+			}
+
+			private function selectGifHandler(e:Event):void
+			{
+				var fArr:Array=new Array();
+				fArr=String(File(e.target).url).split("/");
+				_lastObjFileName=fArr[fArr.length - 1];
+
+				loader=new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderGifHandler);
+				loader.load(new URLRequest(File(e.target).url));
+				//trace("File = "+File(e.target).url+" _ "+_lastObjFileName);
+			}
+
+			private function onLoaderGifHandler(e:Event):void
+			{
+				_txtInfo.text+="载入素材功能" + "\n";
+				var fImage:Image=new Image();
+				fImage.y=_ObjContainerH;
+
+				fImage.source=loader.content;
+
+				fImage.width=(loader.content).width;
+				fImage.height=(loader.content).height;
+
+				//_ObjContainerH+=fImage.height+20;
+
+				_ObjContainerH+=fImage.height;
+
+				trace("---------------1");
+
+				//fImage["pin"]=_lastObjFileName;
+
+				trace(fImage.name);
+
+				_hmObj.put(fImage.name, _lastObjFileName);
+
+				trace("---------------2");
+
+				_ObjContainer.addChild(fImage);
+
+				allowDrag(fImage);
+			}
+
+
+			//允许拖拽
+			private function allowDrag(images:Image):void
+			{
+				//images
+
+				if (_blnLoadMapFinsh)
+				{
+					//创建拖拽监听
+					images.addEventListener(MouseEvent.MOUSE_DOWN, dragHandler);
+				}
+			}
+
+
+			/**
+			 * 开始拖拽
+			 * */
+			private function dragHandler(event:MouseEvent):void
+			{
+				trace("HM name " + event.target.name);
+				_lastObjFileName=_hmObj.getValue(event.target.name);
+
+				//trace("pin "+(event.target)["pin"]);
+
+				_cvObject.buttonMode=true;
+				_cvObject.mouseChildren=true;
+				_cvObject.mouseEnabled=true;
+
+
+
+				// 定义拖拽挂载数据源
+				var ds:DragSource=new DragSource();
+				// 定义拖拽图标(用于第二副图片的拖拽)
+				//var di:Image = new Image();
+
+				_tmpImage=new Image();
+
+
+
+
+				_tmpImage.mouseEnabled=false;
+				_tmpImage.mouseChildren=false;
+
+				// 拖拽对象
+				var target:Image=event.currentTarget as Image;
+
+				_tmpImage.width=target.width;
+				_tmpImage.height=target.height;
+
+				trace("----1");
+
+				//trace("x "+application.mouseX+" y "+application.mouseY);
+
+				//if (target.id=="testArea"){
+				// 添加拖拽数据源数据
+				ds.addData(target, "img");
+				ds.addData(event.localX, "x");
+				ds.addData(event.localY, "y");
+				//}
+
+				/*if (event.currentTarget is Application){
+				   trace("Application");
+				   ds.addData(target, "del");
+				 }*/
+
+				// 拖拽图标
+				//if (target.id == "_img"){
+				_tmpImage.source=new Bitmap(getBitmapData(target.content));
+				//}else{
+				// di = null;
+				//}
+
+				_lastObjPoint=new Point(target.mouseX, target.mouseY);
+
+				_tmpDs=ds;
+
+				_blnOnObjectDrag=true;
+
+				// 执行拖拽
+				DragManager.doDrag(target, _tmpDs, event, _tmpImage, 0, 0, 0.5);
+
+				//DragManager.doDrag(img, dragSource, event, dragImg, 0, 0, 0.5 );
+			}
+
+
+
+			/**
+			 * 进入拖放区域
+			 * */
+			private function dragEnterHandler(event:DragEvent):void
+			{
+				trace("----2");
+
+				trace("formats --- " + event.dragSource.formats);
+
+				trace("target2 _ " + String(event.target));
+
+				// 进入区域, 设置状态为允许拖放
+				if (event.dragSource.hasFormat("img"))
+				{
+					trace("formats --- " + event.dragSource.dataForFormat("img")["id"]);
+
+					if (String(event.target) != "TestFlexDrag0")
+					{
+						DragManager.showFeedback(DragManager.MOVE);
+					}
+
+					DragManager.acceptDragDrop(event.target as UIComponent);
+				}
+			}
+
+			/**
+			 * 释放拖拽
+			 **/
+			private function dragDropHandler(event:DragEvent):void
+			{
+
+
+
+				trace("dragDropHandler");
+
+
+
+				// 复制图片
+				var img:Image=new Image();
+				//img.source = new Bitmap(getBitmapData(event.dragSource.dataForFormat("img") as DisplayObject));
+
+				//img.source =imgsrc;
+				//img.source = _img.source;
+
+				img.source=_tmpImage.source;
+
+				trace("img" + img);
+				trace("img.source" + img.source);
+				// 处理图片防止位置
+				//img.x = event.currentTarget.mouseX - (event.dragSource.dataForFormat("x") as Number);
+				//img.y = event.currentTarget.mouseY - (event.dragSource.dataForFormat("y") as Number);
+				// 显示图片
+				trace(event.currentTarget);
+				// if (event.currentTarget.id=="testArea"){
+
+				trace("!!!!!! event.local x " + event.localX + " y " + event.localY);
+
+				img.x=event.localX - _lastObjPoint.x;
+				img.y=event.localY - _lastObjPoint.y;
+
+				//06.gif
+				trace(_lastObjFileName);
+
+				var fArr:Array=new Array();
+				fArr[0]=_numObjPK++;
+				fArr[1]="NPC";
+				fArr[2]=_lastObjFileName;
+				fArr[3]=img.x;
+				fArr[4]=img.y;
+
+				_arrObjSpace.push(fArr);
+
+				//var myPt:Point=_cvObject.contentToLocal(new Point(event.currentTarget.mouseX,event.currentTarget.mouseY));
+
+				//img.x=myPt.x;
+				//img.y=myPt.y;
+
+				//XXX 坐标 不对
+
+				trace("currentTarget x " + event.currentTarget.mouseX + " y " + event.currentTarget.mouseY);
+				trace("target x " + event.target.mouseX + " y " + event.target.mouseY);
+
+				trace("application x " + application.mouseX + " y " + application.mouseY);
+				//trace("x "+img.x+" y "+img.y);
+
+				_lastObj=img;
+
+				trace("event.currentTarget " + event.currentTarget);
+
+				event.currentTarget.addChild(img);
+
+				//关闭容器鼠标事件
+				_cvObject.buttonMode=false;
+				_cvObject.mouseChildren=false;
+				_cvObject.mouseEnabled=false;
+
+				//}
+				trace("--------------");
+				//testArea.addChild(img);
+
+				//img3.source=imgsrc;
+			}
+
+
+			private function delLastObj():void
+			{
+				var fNum:int=_cvObject.numChildren;
+				trace(fNum);
+				if (fNum > 0)
+				{
+					Bitmap(Object(_cvObject.getChildAt(fNum - 1)).content).bitmapData.dispose();
+					_cvObject.removeChildAt(fNum - 1);
+				}
+
+				_arrObjSpace.pop();
+			}
+
+			//保存物件部署数据
+			private function saveObjPlace():void
+			{
+				trace("===============");
+				trace(_arrObjSpace);
+				trace("===============");
+
+				trace("准备写保存物件部署数据");
+				_txtInfo.text+="保存物件部署数据\n";
+
+				var docsDir:File=File.documentsDirectory;
+				try
+				{
+					docsDir.browseForSave("Save As");
+					docsDir.addEventListener(Event.SELECT, saveStringObjPlaceData);
+				}
+				catch (error:Error)
+				{
+					trace("Failed:", error.message);
+				}
+			}
+
+			private function saveStringObjPlaceData(e:Event):void
+			{
+				var newFile:File=e.target as File;
+				var str:String="Hello.";
+				if (!newFile.exists)
+				{
+					var stream:FileStream=new FileStream();
+					stream.open(newFile, FileMode.WRITE);
+
+					var myStr:String="";
+
+					var myObj:Object=new Object();
+
+					myObj["obj_url"]="images/";
+					myObj["obj_asset"]=_arrObjSpace;
+
+					trace(_arrObjSpace.length);
+
+					trace(JSON.encode(myObj));
+
+					myStr=JSON.encode(myObj);
+
+					/*for (var i:int=0;i<arrMap.length;i++){
+					   myStr="";
+					   for (var j:int=0;j<arrMap[i].length;j++){
+					   //trace(arrMap[i][j]);
+					   _txtMapInfo.text+=arrMap[i][j]+"_";
+
+					   switch(arrMap[i][j]){
+					   case 0:
+					   myStr+="0,";
+					   break;
+					   case 1:
+					   myStr+="1,";
+					   break;
+					   case 2:
+					   myStr+="40,";
+					   break;
+					   default:
+					   myStr+="0,";
+					   }
+					   }
+					   //换行
+					   //myStr+="\n";
+
+					   _txtMapInfo.text+=",\n";
+
+					   if (i==arrMap.length-1){
+					   trace("try i = "+i);
+					   myStr=myStr.slice(0,myStr.length-1);
+					   stream.writeUTFBytes(myStr);
+					   }else{
+					   trace("try M = "+i);
+					   stream.writeUTFBytes(myStr+"\r\n");
+					   }
+					   }
+
+
+
+					   //stream.writeBytes(myByte);
+					   stream.close();
+
+					   _txtInfo.text+="文件保存完毕！\n";
+
+					   //位置和朝向
+					   //OBJ
+					   //scene
+					   //怪物
+					   //AI
+					 */
+
+
+					stream.writeUTFBytes(myStr);
+					stream.close();
+					_txtInfo.text+="文件保存完毕！\n";
+
+				}
+				else
+				{
+					_txtInfo.text+="文件存在禁止保存！\n";
+				}
+			}
+
+			/**
+			 * 获取图片信息
+			 */
+			private function getBitmapData(target:DisplayObject):BitmapData
+			{
+				var res:BitmapData=new BitmapData(target.width, target.height, true, 0xFFFFFF);
+				res.draw(target);
+				return res;
+			}
+
+			//更改地图模式
+			/*      private function onTypeChangeHandler(num:int):void{
+			   trace("num = "+num);
+			   if (num==0){
+			   _mapEditorType=MapType.EDIT_VIEW;
+			   }else if (num==1){
+			   _mapEditorType=MapType.EDIT_GRID;
+			   }else if (num==2){
+			   _mapEditorType=MapType.EDIT_OBJECT;
+			   }else if (num==3){
+			   _mapEditorType=MapType.EDIT_EVENT;
+			   }else{
+			   _mapEditorType=MapType.EDIT_VIEW;
+			   }
+			 }  */
+
+			private function indexChangeHandler(e:IndexChangedEvent):void
+			{
+				var fNum:int=_tabNav.selectedIndex;
+				//trace(_tabNav.selectedIndex);
+				// trace(_tabNav.getTabAt(_tabNav.selectedIndex).label);
+
+
+				if (fNum == 0)
+				{
+					_mapEditorType=MapEditeType.EDIT_VIEW;
+				}
+				else if (fNum == 1)
+				{
+					_mapEditorType=MapEditeType.EDIT_GRID;
+				}
+				else if (fNum == 2)
+				{
+					_mapEditorType=MapEditeType.EDIT_OBJECT;
+				}
+				else if (fNum == 3)
+				{
+					_mapEditorType=MapEditeType.EDIT_EVENT;
+				}
+				else
+				{
+					_mapEditorType=MapEditeType.EDIT_VIEW;
+				}
+			}
+			/**
+			 * hao
+			 * 清空寻路标示
+			 */
+			private function clearFindingWay():void{
+				arrReDraw=new Array();
+trace("arrMap.length is : " + arrMap.length);
+				for (var j:Number=0; j < arrMap.length; j++)
+				{
+					for (var i:Number=0; i < arrMap[j].length; i++)
+					{
+						//drawBox(i,j,arrMap[j][i]);
+						arrReDraw.push(new Array(i, j, arrMap[j][i]));
+					}
+				}
+				var drawBoxTimer:Timer=new Timer(1);
+				drawBoxTimer.addEventListener(TimerEvent.TIMER, runTimer);
+				drawBoxTimer.start();
+trace("redraw");
+			}
+		]]>
+	</mx:Script>
+
+	<mx:Button x="10"
+			   y="30"
+			   width="80"
+			   label="保存"
+			   id="_alertButton"
+			   icon="@Embed(source='images/XiaoIcon_045.png')"
+			   height="70"
+			   labelPlacement="bottom"/>
+	<mx:Button x="190"
+			   y="30"
+			   width="80"
+			   label="测试"
+			   id="_testButton"
+			   icon="@Embed(source='images/XiaoIcon_015.png')"
+			   height="70"
+			   labelPlacement="bottom"/>
+	<mx:Button x="279"
+			   y="30"
+			   width="80"
+			   label="测二进制"
+			   id="_testButton0"
+			   icon="@Embed(source='images/XiaoIcon_015.png')"
+			   height="70"
+			   labelPlacement="bottom"/>
+	<mx:MenuBar x="0"
+				y="0"
+				width="100%"
+				labelField="@label"
+				id="_menuBar"
+				dataProvider="{ _menuBarCollection }"
+				itemClick="menuHandler(event);">
+	</mx:MenuBar>
+	<mx:Panel x="10"
+			  y="110"
+			  width="700"
+			  height="560"
+			  layout="absolute"
+			  title="地图预览"
+			  id="_panImage">
+		<mx:Image x="0"
+				  y="0"
+				  width="690"
+				  height="520"
+				  id="_Image"/>
+		<mx:Canvas id="_cvGrid">
+		</mx:Canvas>
+		<mx:Canvas id="_cvObject"
+				   dragEnter="dragEnterHandler(event);"
+				   dragDrop="dragDropHandler(event);">
+		</mx:Canvas>
+	</mx:Panel>
+	<mx:TextInput x="930"
+				  y="30"
+				  width="60"
+				  text="32"
+				  id="_gridW"/>
+	<mx:TextInput x="930"
+				  y="60"
+				  width="60"
+				  text="32"
+				  id="_gridH"/>
+	<mx:Label x="870"
+			  y="32"
+			  text="网格宽度"/>
+	<mx:Label x="870"
+			  y="62"
+			  text="网格高度"/>
+	<mx:TabNavigator x="720"
+					 y="249"
+					 width="270"
+					 height="420"
+					 id="_tabNav">
+		<mx:Canvas label="可视区"
+				   width="100%"
+				   height="100%">
+			<mx:CheckBox x="12"
+						 y="11"
+						 label="地图事件层"
+						 selected="true"
+						 id="_cb_1"
+						 change="showEventLayer();"/>
+			<mx:CheckBox x="12"
+						 y="37"
+						 label="物件放置层"
+						 selected="true"
+						 id="_cb_2"
+						 change="showObjectLayer();"/>
+			<mx:CheckBox x="12"
+						 y="63"
+						 label="阻挡层（网格）"
+						 selected="true"
+						 id="_cb_3"
+						 change="showGridLayer();"/>
+			<mx:CheckBox x="12"
+						 y="89"
+						 label="背景层"
+						 selected="true"
+						 id="_cb_4"
+						 change="showBackGround();"/>
+		</mx:Canvas>
+		<mx:Canvas label="阻挡"
+				   width="100%"
+				   height="100%">
+			<mx:Button x="130"
+					   y="10"
+					   width="130"
+					   label="加载阻挡"
+					   id="_loadMapInfoButton"
+					   icon="@Embed(source='images/XiaoIcon_015.png')"
+					   height="30"
+					   labelPlacement="right"
+					   click="loadMapInfo(event);"/>
+			<mx:CheckBox x="14"
+						 y="14"
+						 label="加载时绘制地图"
+						 id="_drawBlock"
+						 change="onLoaddrawBlock();"/>
+			<mx:Button x="14"
+					   y="262"
+					   width="125"
+					   label="显示地图数组"
+					   id="_showMapInfo"
+					   icon="@Embed(source='images/XiaoIcon_015.png')"
+					   height="30"
+					   labelPlacement="right"
+					   click="showMapInfo(event);"/>
+			<mx:TextArea x="14"
+						 y="296.8"
+						 width="245.98486"
+						 height="41.199997"
+						 id="_txtMapInfo"/>
+			<mx:Button x="12"
+					   y="347"
+					   width="116"
+					   label="保存二进制"
+					   id="_saveByte"
+					   icon="@Embed(source='images/XiaoIcon_045.png')"
+					   height="30"
+					   labelPlacement="right"
+					   click="saveByte(event);"/>
+			<mx:Button x="142"
+					   y="347"
+					   width="116"
+					   label="保存字符串"
+					   id="_saveString"
+					   icon="@Embed(source='images/XiaoIcon_045.png')"
+					   height="30"
+					   labelPlacement="right"
+					   click="saveString(event);"/>
+			<view:MaskTypeChoser x="16"
+								 y="43"
+								 height="217">
+			</view:MaskTypeChoser>
+			<mx:Button x="137" y="265" label="清空寻路"  click="clearFindingWay()"/>
+		</mx:Canvas>
+		<mx:Canvas label="物件"
+				   width="100%"
+				   height="100%">
+			<mx:Button x="8"
+					   y="8"
+					   label="增加素材"
+					   width="74"
+					   id="_addAsset"
+					   click="addAsset();"/>
+			<mx:Canvas x="9"
+					   y="39"
+					   width="248"
+					   height="237"
+					   id="_ObjContainer">
+			</mx:Canvas>
+			<mx:Button x="106"
+					   y="8"
+					   label="读取配置"
+					   id="_loadObjConfig"/>
+			<mx:Button x="183"
+					   y="8"
+					   label="保存配置"
+					   id="_saveObjConfig"/>
+			<mx:Button x="8"
+					   y="364"
+					   label="读取部署数据"
+					   id="_loadObjPlace"/>
+			<mx:Button x="163"
+					   y="364"
+					   label="保存部署数据"
+					   id="_saveObjPlace"
+					   click="saveObjPlace();"/>
+			<mx:Button x="8"
+					   y="282"
+					   label="删除最后一个"
+					   id="_delLastObj"
+					   height="26"
+					   click="delLastObj();"/>
+		</mx:Canvas>
+		<mx:Canvas label="事件"
+				   width="100%"
+				   height="100%">
+		</mx:Canvas>
+	</mx:TabNavigator>
+	<mx:TextArea id="_txtInfo"
+				 x="720"
+				 y="110"
+				 width="270"
+				 height="130"
+				 borderSides="none"/>
+
+</mx:WindowedApplication>

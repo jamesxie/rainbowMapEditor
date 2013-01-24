@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="1000" height="600" initialize="GameAssetTools_initializeHandler()">
+	<mx:Style source="style/style.css">
+		
+	</mx:Style>
+	<mx:Script>
+		<![CDATA[
+			import mx.events.IndexChangedEvent;
+			import mx.events.FlexEvent;
+			import mx.controls.Alert;
+			import mx.collections.ArrayCollection;
+		
+			import com.yxg.gameassettools.data.ImageAssetData;
+			
+			//当前数据序号
+			private var _nowId:int=0;
+			
+			private var _arrAllData:Array;
+			
+			private var _lastURL:String;
+			
+			//当前编辑对象
+			private var _nowShow:int;
+			
+			private var _bitmapPreview:Bitmap;
+			
+			//动画开关
+			private var _blnAnimation:Boolean;
+			//动画Timer
+			private var _timerAnimation:Timer;
+			//动画当前数
+			private var _numAnimationFrame:int;
+			
+			//拷贝文件到URL
+			private var _strCopyToURL:String;
+			//拷贝当前文件ID
+			private var _numCopyToNowId:int;
+			
+            [Bindable]
+            public var sDirection_data:ArrayCollection = new ArrayCollection(
+                [ {label:"- 选择(面朝)方向 -", data:0},
+                  {label:"(↑)上", data:360},
+                  {label:"(↗)右上", data:45},
+                  {label:"(→)右", data:90},
+                  {label:"(↘)右下", data:135},
+                  {label:"(↓)下", data:180},
+                  {label:"(↙)左下", data:225},
+                  {label:"(←)左", data:270},
+                  {label:"(↖)左上", data:315} ]);
+                  
+            [Bindable]
+            public var sStyle_data:ArrayCollection = new ArrayCollection(
+                [ {label:"- 选择(动作)类型 -", data:0},
+                  {label:"站立(呼吸)", data:1},
+                  {label:"跑步(动作)", data:2},
+                  {label:"战斗(砍杀动作)", data:3},
+                  {label:"战斗(施法动作)", data:4} ]);
+          	
+          	[Bindable]
+          	private var _dp1:ArrayCollection = new ArrayCollection();
+          	
+            //选项卡一 --------------------------------------------
+            private function ifHasReadyActionHandler():void{
+            	if(ifHasReadyAction.selected == true) {
+            		readyAction.enabled=true;
+            	}else{
+            		readyAction.enabled=false;
+            	}
+            }
+			
+			protected function loadImgHandler():void
+			{
+				trace("准备载入图片");
+				
+				if (checkLegal()){
+					try {
+						var fileForOpen:File=new File();
+						var txtFilter:FileFilter = new FileFilter("Image(*.jpg;*.jpeg;*.gif;*.png;*.bmp)", "*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+						fileForOpen.browseForOpen("打开图片",[txtFilter]);
+						fileForOpen.addEventListener(Event.SELECT,selectImgFileHandler);
+					}catch (error:Error) {
+						trace("打开图片错误");
+						trace("Failed:"+error.message);
+					}
+				}
+			}
+			
+			private function checkLegal():Boolean {
+				var fBln:Boolean=true;
+				var fMessage:String="请检查以下数据："+"\n\n";
+				
+				if (tName.text==""){
+					fBln=false;
+					fMessage+="【人物名称】 不可为空"+"\n";
+				}
+				
+				if (sDirection.value==0){
+					fBln=false;
+					fMessage+="【方向】 必须选择一个（面朝）方向"+"\n";
+				}
+				
+				if (sStyle.value==0){
+					fBln=false;
+					fMessage+="【方向】 必须选择一个（动作）类型"+"\n";
+				}
+				
+				if (!fBln){
+					fMessage+="\n";
+					Alert.show(fMessage,"信息错误");
+				}
+				
+				return fBln;
+			}
+			
+			private function selectImgFileHandler(e:Event):void{
+				
+				trace(File(e.target).url);
+				
+				_lastURL=File(e.target).url;
+				
+				var loader:Loader=new Loader();
+				//loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS,onProgressHandler);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,onLoaderImgHandler);
+				
+				loader.load(new URLRequest(File(e.target).url));
+			}
+			
+			private function onLoaderImgHandler(e:Event):void{
+				var loader:Loader = Loader(e.target.loader);
+            	viewImg.width=(loader.content).width;
+            	viewImg.height=(loader.content).height;
+            	viewImg.source=loader.content;
+            	
+            	
+            	//DGFields
+            	
+            	_dp1.addItem(getObj(_nowId,tName.text,sDirection.selectedItem.label,sStyle.selectedItem.label,false));
+            	
+            	var fIntReadyAction:int=0;
+            	if (ifHasReadyAction.selected){
+            		fIntReadyAction=readyAction.value;
+            	}
+            	
+            	trace(_lastURL);
+            	
+            	trace(tName.text);
+            	
+            	trace(String(sDirection.value));
+            	
+            	trace(String(sStyle.value));
+            	
+            	trace(fIntReadyAction);
+            	
+            	var fHeight:int=0;
+            	
+            	if (splitHeight.value==0){
+            		fHeight=(loader.content).height;
+            	}else{
+            		fHeight=splitHeight.value;
+            	}
+            	
+            	var fIAD:ImageAssetData=new ImageAssetData(_lastURL,tName.text,String(sDirection.value),String(sStyle.value),splitWidth.value,fHeight,fIntReadyAction);
+            	
+            	
+            	//加入图像数据
+            	
+            	//fIAD.setArrBitmapData();
+            	//
+            	trace(fIAD.toString());
+            	
+            	trace("load content "+loader.content);
+            	var fNum:int=(loader.content).width/splitWidth.value;
+            	
+            	trace("图像数量"+fNum);
+            	var fArrTempBitmapDatas:Array=new Array();
+            	for (var i:int=0;i<fNum;i++){
+            		var fBD : BitmapData = new BitmapData(splitWidth.value, fHeight);
+            		var fRect : Rectangle = new Rectangle(splitWidth.value*i, 0, splitWidth.value*(i+1), fHeight);
+            		var pt : Point = new Point(0, 0);
+            		fBD.copyPixels(Bitmap(loader.content).bitmapData, fRect, pt);
+            		fArrTempBitmapDatas.push(fBD);
+	            	/*var fBD : BitmapData = new BitmapData(Bitmap(LoaderInfo(e.target).content).width, Bitmap(LoaderInfo(e.target).content).height);
+					var fRect : Rectangle = new Rectangle(0, 0, Bitmap(LoaderInfo(e.target).content).width, Bitmap(LoaderInfo(e.target).content).height);
+					var pt : Point = new Point(0, 0);
+					fBD.copyPixels(Bitmap(LoaderInfo(e.target).content).bitmapData, fRect, pt);
+					_nowTempHuman.push(fBD);*/
+            	}
+            	
+            	fIAD.setArrBitmapData(fArrTempBitmapDatas);
+            	
+            	loader.unload();
+            	
+            	_arrAllData.push(fIAD);
+            	
+            	//ImageAssetData
+            	
+            	_nowId++;
+			}
+			
+			private function getObj(colId:int,colName:String,colDirection:String,colStyle:String,colFix:Boolean):Object{
+				var fObj:Object=new Object();
+				fObj["colId"]=colId;
+				fObj["colName"]=colName;
+				fObj["colDirection"]=colDirection;
+				fObj["colStyle"]=colStyle;
+				fObj["colFix"]=colFix;	
+				return fObj;
+			}
+			
+			
+			//选项卡二 --------------------------------------------
+			//开始拖拽位置
+			private function onImageDragStart():void{
+				_imgShow.startDrag();
+			}
+			
+			private function onImageDragStop():void{
+				_imgShow.stopDrag();
+				tEditX.text=String(_imgShow.x-320);
+				tEditY.text=String(_imgShow.y-320);
+			}
+			
+			//辅助线开关
+			private function openLineHandler():void{
+				if (imgLine.visible){
+					imgLine.visible=false;
+				}else{
+					imgLine.visible=true;
+				}
+			}
+			
+			//阴影开关
+			private function openShadowHandler():void{
+				if (imgShadow.visible){
+					imgShadow.visible=false;
+				}else{
+					imgShadow.visible=true;
+				}
+			}
+			
+			//动画开关
+			private function openAnimationHandler():void{
+				_numAnimationFrame=0;
+				if (_blnAnimation){
+					_blnAnimation=false;
+					_timerAnimation.stop();
+				}else{
+					_blnAnimation=true;
+					_timerAnimation.delay=TimerDelay.value;
+					_timerAnimation.start();
+				}
+			}
+			
+			//更新位置
+			private function updateSpaceHandler():void{
+				_imgShow.x = Number(tEditX.text)+320;
+				_imgShow.y = Number(tEditY.text)+320;
+			}
+			
+			//保存位置
+			private function saveSpaceHandler():void{
+				var fPoint:Point=new Point();
+				fPoint.x=Number(tEditX.text);
+				fPoint.y=Number(tEditY.text);
+				ImageAssetData(_arrAllData[_nowShow])._pointFix=fPoint;
+				
+				
+				trace("保存标志");
+				
+				trace(DGFields.selectedItem["colFix"]);
+				//更改修正标志
+				DGFields.selectedItem["colFix"]=true;
+				
+				//_dp1.
+				
+				var fIndex:int=DGFields.selectedIndex;
+				
+				_dp1.getItemAt(DGFields.selectedIndex)["colFix"]=true;
+				
+				DGFields.dataProvider=_dp1;
+				
+				DGFields.selectedIndex=fIndex;
+
+				//_dp1.addItem(getObj(_nowId,tName.text,sDirection.selectedItem.label,sStyle.selectedItem.label,false));
+				
+				
+			}
+			
+			
+			//选项卡三 --------------------------------------------
+			
+			
+			//选项卡四 --------------------------------------------
+			
+			
+			//其他类别 --------------------------------------------
+			protected function GameAssetTools_initializeHandler():void
+			{
+				// TODO Auto-generated method stub
+				_arrAllData=new Array();
+				
+				_lastURL="";
+				
+				_bitmapPreview=new Bitmap();
+				
+				_blnAnimation=false;
+				
+				_timerAnimation=new Timer(200);
+				_timerAnimation.addEventListener(TimerEvent.TIMER,onTimerRunHandler);
+				
+				_numAnimationFrame=0;
+				
+			}
+			
+			//动画Timer Handler
+			private function onTimerRunHandler(e:TimerEvent):void{
+				//trace("timer Run");
+				
+				_bitmapPreview.bitmapData=ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[_numAnimationFrame];
+				_numAnimationFrame++;
+				
+				if (_numAnimationFrame>ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData().length-1){
+					if (ImageAssetData(_arrAllData[_nowShow])._readyAction>0){
+						_numAnimationFrame=ImageAssetData(_arrAllData[_nowShow])._readyAction;
+					}else{
+						_numAnimationFrame=0;
+					}
+				}
+			}
+			
+			//改变编辑对象
+			private function DGFieldsHandler():void{
+				trace(DGFields.selectedIndex);
+				trace(DGFields.selectedItem["colDirection"]);
+				
+				_nowShow=DGFields.selectedIndex;
+				
+				//当前是编辑卡
+				
+				trace(BitmapData(ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[0]).width);
+				trace(BitmapData(ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[0]).height);
+				
+				if (ImageAssetData(_arrAllData[_nowShow])._pointFix.x==0 && ImageAssetData(_arrAllData[_nowShow])._pointFix.y==0){
+					_imgShow.x=0;
+					_imgShow.y=0;
+				}else{
+					trace("X _ "+ImageAssetData(_arrAllData[_nowShow])._pointFix.x+" _ Y _ "+ImageAssetData(_arrAllData[_nowShow])._pointFix.y);
+					
+					_imgShow.x=ImageAssetData(_arrAllData[_nowShow])._pointFix.x+320;
+					_imgShow.y=ImageAssetData(_arrAllData[_nowShow])._pointFix.y+320;
+				}
+				
+				tEditX.text=String(_imgShow.x-320);
+				tEditY.text=String(_imgShow.y-320);
+				
+				//XXX 2009-09-16
+				_bitmapPreview=new Bitmap();
+				_imgShow.width=BitmapData(ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[0]).width;
+				_imgShow.height=BitmapData(ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[0]).height;
+				_bitmapPreview.bitmapData=ImageAssetData(_arrAllData[_nowShow]).getArrBitmapData()[0];
+				if (_tabNav.selectedIndex==1){
+					_imgShow.source=_bitmapPreview;
+				}
+			}
+
+			protected function test_clickHandler():void{
+				Alert.show("2009-12-16 V 1.0","提示");
+			}
+
+			//选项卡改变
+			protected function _tabNav_changeHandler():void
+			{
+				trace("》》 "+_tabNav.selectedIndex);
+				if (_tabNav.selectedIndex==0){
+					if (_blnAnimation){
+						_blnAnimation=false;
+						if (_timerAnimation.running){
+							_numAnimationFrame=0;
+							_timerAnimation.stop();
+						}
+					}
+				}
+				
+				if (_tabNav.selectedIndex==1){
+					_imgShow.source=_bitmapPreview;
+				}
+			}
+
+			//保存所有数据
+			protected function saveAllDataHandler():void
+			{
+				var docsDir:File = File.documentsDirectory;
+				try
+				{
+				    docsDir.browseForSave("Save Data");
+				    docsDir.addEventListener(Event.SELECT, saveStringData);
+				    
+				    
+				}
+				catch (error:Error)
+				{
+				    trace("Failed:", error.message);
+				}
+			}
+			
+			private function saveStringData(e:Event):void{
+				var newFile:File = e.target as File;
+			    if (!newFile.exists){
+			        var stream:FileStream = new FileStream();
+			        stream.open(newFile, FileMode.WRITE);
+			        
+			        var myStr:String="";
+			        
+			        for (var i:int=0;i<_arrAllData.length;i++){
+			        	myStr+=ImageAssetData(_arrAllData[i]).toString()+",\r\n";
+			        }
+
+			        stream.writeUTFBytes(myStr);
+			        
+			        stream.close();  
+			        
+			       	trace("文件保存完毕！开始保存图片");
+			       	
+			         _strCopyToURL=newFile.url;
+			         
+			          trace("拷贝到 1 "+_strCopyToURL);
+			         
+			         var fArr:Array=new Array(); 
+			         fArr=_strCopyToURL.split("/");
+			         fArr.pop();
+			         
+			         _strCopyToURL="";
+			         for (var j:int=0;j<fArr.length;j++){
+			         	_strCopyToURL+=fArr[j]+"/";
+			         }
+			         
+			         trace("拷贝到 2 "+_strCopyToURL);
+			         
+			         readyCopyImage();
+			        
+			    }else{
+			    	Alert.show("文件存在,禁止保存！");
+			    }
+			}
+			
+			private function readyCopyImage():void{
+				_numCopyToNowId=0;
+				
+				var fTimer:Timer=new Timer(500);
+				fTimer.addEventListener(TimerEvent.TIMER,CopyImageHandler);
+				
+				fTimer.start();
+			}
+			
+			private function CopyImageHandler(e:TimerEvent):void{
+				
+				var fImageAssetData:ImageAssetData;
+				
+				fImageAssetData=ImageAssetData(_arrAllData[_numCopyToNowId]);
+				
+				var sourceFile:File = File.documentsDirectory;
+				sourceFile = sourceFile.resolvePath(fImageAssetData._url);
+				var destination:File = File.documentsDirectory;
+				
+				var newfileName:String="";
+				newfileName=fImageAssetData._name+"_"+fImageAssetData._style+"_"+fImageAssetData._direction+"_"+String(fImageAssetData._readyAction)+"_";
+				newfileName+=fImageAssetData._splitWidth+"_"+fImageAssetData._splitHeight+"_"+String(fImageAssetData._pointFix.x)+"_"+String(fImageAssetData._pointFix.y);
+				destination = destination.resolvePath(_strCopyToURL+"copyFile/"+newfileName+".png");
+				
+				try{
+				    sourceFile.copyTo(destination, true);
+				    _numCopyToNowId++;
+				    
+				    if (_numCopyToNowId>_arrAllData.length-1){
+				    	Timer(e.target).stop();
+				    	Alert.show("保存完毕","提示");
+				    }
+				}catch (error:Error){
+					Alert.show("图片文件保存失败！\n"+error.message);
+				    trace("Error:", error.message);
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:Button x="9" y="8" label="游戏素材工具" click="test_clickHandler()"/>
+	<mx:TabNavigator x="10" y="40" width="660" height="530" id="_tabNav" change="_tabNav_changeHandler()">
+		<mx:Canvas label="载入 - 切割" width="100%" height="100%">
+			<mx:Label x="10" y="72" text="方  向"/>
+			<mx:ComboBox x="70" y="70" width="140" id="sDirection" dataProvider="{sDirection_data}"></mx:ComboBox>
+			<mx:Label x="224" y="72" text="类  型"/>
+			<mx:ComboBox x="270" y="70" width="140" id="sStyle" dataProvider="{sStyle_data}"></mx:ComboBox>
+			<mx:CheckBox x="10" y="150" label="是否有准备动作 (如：起身)" id="ifHasReadyAction" click="ifHasReadyActionHandler();"/>
+			<mx:Label x="224" y="150" text="结束帧" enabled="false"/>
+			<mx:NumericStepper x="270" y="150" width="100" id="readyAction" enabled="false" maximum="100"/>
+			<mx:Label x="10" y="30" text="人物名称"/>
+			<mx:TextInput x="72" y="30" width="140" id="tName"/>
+			<mx:RadioButton x="270" y="30" label="主角" enabled="false"/>
+			<mx:Label x="224" y="31" text="类  型" enabled="false"/>
+			<mx:RadioButton x="330" y="30" label="怪物" enabled="false"/>
+			<mx:RadioButton x="390" y="30" label="NPC" enabled="false"/>
+			<mx:CheckBox x="460" y="30" label="是否可作为宠物" enabled="false"/>
+			<mx:NumericStepper x="110" y="110" width="100" enabled="true" value="100" maximum="1000" id="splitWidth" minimum="1"/>
+			<mx:Label x="10" y="110" text="(切割) 宽 度"/>
+			<mx:Label x="224" y="110" text="高  度" enabled="false"/>
+			<mx:NumericStepper x="270" y="110" width="100" enabled="true" value="0" maximum="1000" id="splitHeight"/>
+			<mx:Label x="384" y="110" text="（0 为自动适应高度）" enabled="false"/>
+			<mx:Button x="10" y="190" label="指定载入图片" width="140" height="60" icon="@Embed(source='icon/tabicons_100.gif')" labelPlacement="right" click="loadImgHandler()"/>
+			<mx:Image x="10" y="260" width="578" height="234" id="viewImg"/>
+		</mx:Canvas>
+		<mx:Canvas label="编辑位置" width="100%" height="100%">
+			<mx:Canvas x="10" y="20" width="640" height="384" backgroundColor="0xFFFFFF">
+				<mx:Image x="280" y="300" width="80" height="40" id="imgShadow" source="@Embed(source='images/shadow.png')"/>
+				<mx:Image x="0" y="0" width="640" height="384" id="imgLine" source="@Embed(source='images/asset_line.png')"/>
+				
+				<mx:Image x="0" y="0" width="640" height="384" id="_imgShow" mouseDown="onImageDragStart();" mouseUp="onImageDragStop();"/>
+			</mx:Canvas>
+			<mx:Button x="10" y="412" label="辅助线【开关】" width="120" height="40" click="openLineHandler();"/>
+			<mx:Button x="140" y="412" label="阴   影【开关】" width="120" height="40" click="openShadowHandler();"/>
+			<mx:Button x="269" y="412" label="动   画【开关】" width="120" height="40" click="openAnimationHandler();"/>
+			<mx:Label x="401" y="422" text="动 画 间 隔"/>
+			<mx:NumericStepper x="472" y="420" maximum="10000" minimum="10" value="200" id="TimerDelay"/>
+			<mx:Label x="563" y="422" text="毫 秒"/>
+			<mx:Label x="12" y="466" text="目前位置"/>
+			<mx:TextInput x="106" y="466" width="60" text="-320" id="tEditX"/>
+			<mx:TextInput x="198" y="466" width="60" text="-320" id="tEditY"/>
+			<mx:Label x="86" y="466" text="X"/>
+			<mx:Label x="177" y="466" text="Y"/>
+			<mx:Button x="269" y="465" label="更新位置" click="updateSpaceHandler()"/>
+			<mx:Button x="550" y="454" label="保存位置" width="100" height="40" click="saveSpaceHandler()"/>
+		</mx:Canvas>
+	</mx:TabNavigator>
+    
+	<mx:DataGrid x="680" y="65" width="310" height="460" id="DGFields" dataProvider="{_dp1}" itemClick="DGFieldsHandler()">
+		<mx:columns>
+			<mx:DataGridColumn headerText="序号" dataField="colId"/>
+			<mx:DataGridColumn headerText="名称" dataField="colName"/>
+			<mx:DataGridColumn headerText="方向" dataField="colDirection"/>
+			<mx:DataGridColumn headerText="类型" dataField="colStyle"/>
+			<mx:DataGridColumn headerText="修正" dataField="colFix"/>
+		</mx:columns>
+	</mx:DataGrid>
+	<mx:Button x="680" y="532" label="保存数据" width="310" height="37" click="saveAllDataHandler()"/>
+</mx:WindowedApplication>
