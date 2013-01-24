@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   width="1200" height="800" backgroundColor="0x666666"
+					   showStatusBar="false" backgroundAlpha="0">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<fx:XMLList id="myXMLListMenuBar" xmlns="">
+			<menuitem id="menu1" label="文件(F)">
+				<menuitem id="SubMenu1_1" label="新建项目(/N)" type="normal" groupName="one"/>
+				<menuitem id="SubMenu1_2" label="打开项目(_O)" type="normal" groupName="one"/>
+				<menuitem id="SubMenu1_3" label="---" type="radio" groupName="one" enabled="false"/>
+				<menuitem id="SubMenu1_4" label="保存项目(S)" type="radio" groupName="one"/>
+				<menuitem id="SubMenu1_5" label="----------------" type="radio" groupName="one" enabled="false"/>
+				<menuitem id="SubMenu1_6" label="退出(X)" type="radio" groupName="one"/>
+			</menuitem>
+			<menuitem id="menu2" label="编辑(E)">
+				<menuitem id="SubMenu2_1" label="撤销(Z)	ctrl+z" type="radio" groupName="two"/>
+				<menuitem id="SubMenu2_2" label="访问(L)" type="radio" groupName="two"/>
+				<menuitem id="SubMenu2_3" label="关于(A)" type="radio" groupName="two"/>
+			</menuitem>
+			<menuitem id="menu3" label="窗口(W)">
+				<menuitem id="SubMenu3_1" label="全局(E)" type="check" select/>
+				<menuitem id="SubMenu3_3" label="层级(L)" type="check" groupName="two"/>
+				<menuitem id="SubMenu3_2" label="事件(E)" type="check"/>
+				<menuitem id="SubMenu3_3" label="素材(L)" type="check" groupName="two"/>
+				<menuitem id="SubMenu3_4" label="----------------" enabled="false"/>
+				<menuitem id="SubMenu3_5" label="重新布局(R)" type="radio" groupName="two"/>
+			</menuitem>
+			<menuitem id="menu4" label="运行(R)">
+				<menuitem id="SubMenu4_1" label="运行(R)" type="radio" groupName="four"/>
+				<menuitem id="SubMenu4_2" label="调试(D)" type="radio" groupName="four"/>
+			</menuitem>
+			<menuitem id="menu5" label="帮助(H)">
+				<menuitem id="SubMenu5_1" label="实用手册(G)" type="radio" groupName="five"/>
+				<menuitem id="SubMenu5_2" label="访问(L)" type="radio" groupName="five">
+					<menuitem id="SubMenu5_2_1" label="官网(H)" type="radio" groupName="five"/>
+					<menuitem id="SubMenu5_2_2" label="博客(B)" type="radio" groupName="five"/>
+				</menuitem>
+				<menuitem id="SubMenu5_3" label="关于(A)" type="radio" groupName="five"/>
+			</menuitem>
+		</fx:XMLList>
+
+	</fx:Declarations>
+	<!-- 组建 begin -->
+	<mx:MenuBar x="0" y="0" width="100%" dataProvider="{myXMLListMenuBar}" labelField="@label">
+		
+	</mx:MenuBar>
+	<s:RadioButton x="62" y="84" label="单选框"/>
+	<!-- 组建 end -->
+</s:WindowedApplication>
