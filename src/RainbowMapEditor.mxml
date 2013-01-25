@@ -1,52 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
-					   xmlns:s="library://ns.adobe.com/flex/spark" 
-					   xmlns:mx="library://ns.adobe.com/flex/mx" 
-					   width="1200" height="800" backgroundColor="0x666666"
-					   showStatusBar="false" backgroundAlpha="0">
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   width="1200"
+					   height="800"
+					   backgroundColor="0x666666"
+					   showStatusBar="false"
+					   backgroundAlpha="0">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-		<fx:XMLList id="myXMLListMenuBar" xmlns="">
-			<menuitem id="menu1" label="文件(F)">
-				<menuitem id="SubMenu1_1" label="新建项目(/N)" type="normal" groupName="one"/>
-				<menuitem id="SubMenu1_2" label="打开项目(_O)" type="normal" groupName="one"/>
-				<menuitem id="SubMenu1_3" label="---" type="radio" groupName="one" enabled="false"/>
-				<menuitem id="SubMenu1_4" label="保存项目(S)" type="radio" groupName="one"/>
-				<menuitem id="SubMenu1_5" label="----------------" type="radio" groupName="one" enabled="false"/>
-				<menuitem id="SubMenu1_6" label="退出(X)" type="radio" groupName="one"/>
+		<fx:XMLList id="myXMLListMenuBar"
+					xmlns="">
+			<menuitem id="menu1"
+					  label="文件(F)">
+				<menuitem id="SubMenu1_1"
+						  label="新建(N)"
+						  type="normal"
+						  data="SubMenu1_1"/>
+				<menuitem id="SubMenu1_2"
+						  label="打开(O)"
+						  type="normal"
+						  data="SubMenu1_2"/>
+				<menuitem type="separator"/>
+				<menuitem id="SubMenu1_3"
+						  label="保存(S)"
+						  type="normal"
+						  data="SubMenu1_3"/>
+				<menuitem type="separator"/>
+				<menuitem id="SubMenu1_4"
+						  label="退出(X)"
+						  type="normal"
+						  data="SubMenu1_4"/>
 			</menuitem>
-			<menuitem id="menu2" label="编辑(E)">
-				<menuitem id="SubMenu2_1" label="撤销(Z)	ctrl+z" type="radio" groupName="two"/>
-				<menuitem id="SubMenu2_2" label="访问(L)" type="radio" groupName="two"/>
-				<menuitem id="SubMenu2_3" label="关于(A)" type="radio" groupName="two"/>
+			<menuitem id="menu2"
+					  label="编辑(E)">
+				<menuitem id="SubMenu2_1"
+						  label="撤销(Z)	ctrl+z"
+						  type="radio"
+						  groupName="two"/>
+				<menuitem id="SubMenu2_2"
+						  label="访问(L)"
+						  type="radio"
+						  groupName="two"/>
+				<menuitem id="SubMenu2_3"
+						  label="关于(A)"
+						  type="radio"
+						  groupName="two"/>
 			</menuitem>
-			<menuitem id="menu3" label="窗口(W)">
-				<menuitem id="SubMenu3_1" label="全局(E)" type="check"/>
-				<menuitem id="SubMenu3_3" label="层级(L)" type="check" groupName="two"/>
-				<menuitem id="SubMenu3_2" label="事件(E)" type="check"/>
-				<menuitem id="SubMenu3_3" label="素材(L)" type="check" groupName="two"/>
-				<menuitem id="SubMenu3_4" label="----------------" enabled="false"/>
-				<menuitem id="SubMenu3_5" label="重新布局(R)" type="radio" groupName="two"/>
+			<menuitem id="menu3"
+					  label="窗口(W)">
+				<menuitem id="SubMenu3_1"
+						  label="全局(G)"
+						  type="check"
+						  toggled="false"/>
+				<menuitem id="SubMenu3_3"
+						  label="层级(L)"
+						  type="check"
+						  toggled="true"/>
+				<menuitem id="SubMenu3_2"
+						  label="事件(E)"
+						  type="check"
+						  toggled="true"/>
+				<menuitem id="SubMenu3_3"
+						  label="素材(L)"
+						  type="check"
+						  toggled="true"/>
+				<menuitem type="separator"/>
+				<menuitem id="SubMenu3_5"
+						  label="重置布局(R)"
+						  type="normal"/>
 			</menuitem>
-			<menuitem id="menu4" label="运行(R)">
-				<menuitem id="SubMenu4_1" label="运行(R)" type="radio" groupName="four"/>
-				<menuitem id="SubMenu4_2" label="调试(D)" type="radio" groupName="four"/>
+			<menuitem id="menu4"
+					  label="运行(R)">
+				<menuitem id="SubMenu4_1"
+						  label="预览(V)"
+						  type="normal"/>
+				<menuitem id="SubMenu4_2"
+						  label="调试(D)"
+						  type="normal"/>
+				<menuitem type="separator"/>
+				<menuitem id="SubMenu4_1"
+						  label="运行(R)"
+						  type="normal"/>
 			</menuitem>
-			<menuitem id="menu5" label="帮助(H)">
-				<menuitem id="SubMenu5_1" label="实用手册(G)" type="radio" groupName="five"/>
-				<menuitem id="SubMenu5_2" label="访问(L)" type="radio" groupName="five">
-					<menuitem id="SubMenu5_2_1" label="官网(H)" type="radio" groupName="five"/>
-					<menuitem id="SubMenu5_2_2" label="博客(B)" type="radio" groupName="five"/>
+			<menuitem id="menu5"
+					  label="帮助(H)">
+				<menuitem id="SubMenu5_1"
+						  label="手册(G)"
+						  type="radio"
+						  groupName="five"/>
+				<menuitem id="SubMenu5_2"
+						  label="访问(L)"
+						  type="radio"
+						  groupName="five">
+					<menuitem id="SubMenu5_2_1"
+							  label="官网(H)"
+							  type="radio"
+							  groupName="five"
+							  data="SubMenu5_2_1"/>
+					<menuitem id="SubMenu5_2_2"
+							  label="反馈(F)"
+							  type="radio"
+							  groupName="five"
+							  data="SubMenu5_2_2"/>
 				</menuitem>
-				<menuitem id="SubMenu5_3" label="关于(A)" type="radio" groupName="five"/>
+				<menuitem id="SubMenu5_3"
+						  label="关于(A)"
+						  type="radio"
+						  groupName="five"/>
 			</menuitem>
 		</fx:XMLList>
 
 	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.MenuEvent;
+			import mx.managers.PopUpManager;
+			
+			import panel.CreateNewProject;
+			
+			import windows.WinNewProject;
+
+
+			protected function menuBar_ClickHandler(event:MenuEvent):void
+			{
+				// TODO Auto-generated method stub
+				var fData:String=String(event.item.@data);
+				//Alert.show("event.item.@data " + fData);
+
+				switch (fData)
+				{
+					case "SubMenu1_1":
+						var fCreateNewProject:WinNewProject=new WinNewProject();
+						PopUpManager.addPopUp(fCreateNewProject, this, true);
+
+						//fCreateNewProject.visible = true;
+						break;
+					case "SubMenu5_2_1":
+						var fRequest1:URLRequest=new URLRequest("http://www.sina.com");
+						navigateToURL(fRequest1);
+						break;
+					case "SubMenu5_2_2":
+						var fRequest2:URLRequest=new URLRequest("http://www.sohu.com");
+						navigateToURL(fRequest2);
+						break;
+					default:
+
+				}
+			}
+		]]>
+	</fx:Script>
+
 	<!-- 组建 begin -->
-	<mx:MenuBar x="0" y="0" width="100%" dataProvider="{myXMLListMenuBar}" labelField="@label">
-		
+	<mx:MenuBar x="0"
+				y="0"
+				width="100%"
+				id="_menuBar"
+				dataProvider="{myXMLListMenuBar}"
+				labelField="@label"
+				itemClick="menuBar_ClickHandler(event)">
+
 	</mx:MenuBar>
-	<s:RadioButton x="62" y="84" label="单选框"/>
+	<s:RadioButton x="62"
+				   y="84"
+				   label="单选框"/>
 	<!-- 组建 end -->
 </s:WindowedApplication>

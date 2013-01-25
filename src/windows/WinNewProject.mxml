@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="800" height="600" backgroundColor="0xEFEFEF" title="Create New Project" creationComplete="init()" close="closeHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			
+			private function init():void{
+				PopUpManager.centerPopUp(this);
+			}
+
+			protected function closeHandler(event:CloseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Group x="10" y="10" width="780" height="60">
+		<s:TextInput x="117" y="16" width="70" text="32"/>
+		<s:TextInput x="306" y="13" width="70" text="32"/>
+		<s:Label x="23" y="24" text="网格宽像素(Px)"/>
+		<s:Label x="195" y="16" text="网格高像素(Px)"/>
+	</s:Group>
+</s:TitleWindow>
