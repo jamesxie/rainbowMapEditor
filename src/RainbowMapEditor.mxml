@@ -114,12 +114,14 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import data.GlobalData;
+
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
 			import mx.managers.PopUpManager;
-			
+
 			import panel.CreateNewProject;
-			
+
 			import windows.WinNewProject;
 
 
@@ -132,18 +134,23 @@
 				switch (fData)
 				{
 					case "SubMenu1_1":
+						if (GlobalData.DATA_READY)
+						{
+							//TODO
+							Alert.show("请先保存您的应用");
+							return;
+						}
 						var fCreateNewProject:WinNewProject=new WinNewProject();
 						PopUpManager.addPopUp(fCreateNewProject, this, true);
-
 						//fCreateNewProject.visible = true;
 						break;
 					case "SubMenu5_2_1":
-						var fRequest1:URLRequest=new URLRequest("http://www.sina.com");
-						navigateToURL(fRequest1);
+						var fRequest5_2_1:URLRequest=new URLRequest("http://www.sina.com");
+						navigateToURL(fRequest5_2_1);
 						break;
 					case "SubMenu5_2_2":
-						var fRequest2:URLRequest=new URLRequest("http://www.sohu.com");
-						navigateToURL(fRequest2);
+						var fRequest5_2_2:URLRequest=new URLRequest("http://www.sohu.com");
+						navigateToURL(fRequest5_2_2);
 						break;
 					default:
 
