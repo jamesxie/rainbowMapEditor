@@ -19,24 +19,23 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import data.GlobalData;
+			import com.xskip.rainbow.editor.data.GlobalData;
 			
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
-
+			
 			private function init():void
 			{
 				PopUpManager.centerPopUp(this);
 			}
-
+			
 			protected function closeHandler(event:CloseEvent):void
 			{
 				// TODO Auto-generated method stub
 				PopUpManager.removePopUp(this);
 			}
-
-
+			
 			protected function btn_yes_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
@@ -51,20 +50,19 @@
 				GlobalData.WIDTH_TILE_PIXEL=int(input_tile_pixel_width.text);
 				GlobalData.HEIGHT_TILE_PIXEL=int(input_tile_pixel_height.text);
 
-				GlobalData.DATA_READY = true;
+				GlobalData.DATA_READY=true;
 
-				Alert.show("数据保存完毕" + GlobalData.WIDTH_SCREEN_PIXEL);
-				
-				
+				//Alert.show("数据保存完毕" + GlobalData.WIDTH_SCREEN_PIXEL);
+
 				PopUpManager.removePopUp(this);
 			}
-
+			
 			protected function btn_no_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
 				PopUpManager.removePopUp(this);
 			}
-
+			
 		]]>
 	</fx:Script>
 
@@ -149,5 +147,6 @@
 			  y="188"
 			  label="取  消"
 			  width="100"
-			  height="40" click="btn_no_clickHandler(event)"/>
+			  height="40"
+			  click="btn_no_clickHandler(event)"/>
 </s:TitleWindow>

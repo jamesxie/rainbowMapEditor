@@ -1,4 +1,4 @@
-package data
+package com.xskip.rainbow.editor.data
 {
 
 	public class GlobalData

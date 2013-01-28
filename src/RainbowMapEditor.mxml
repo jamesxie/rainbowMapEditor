@@ -6,7 +6,8 @@
 					   height="800"
 					   backgroundColor="0x666666"
 					   showStatusBar="false"
-					   backgroundAlpha="0">
+					   backgroundAlpha="0"
+					   creationComplete="init()">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<fx:XMLList id="myXMLListMenuBar"
@@ -53,21 +54,25 @@
 						  label="全局(G)"
 						  type="check"
 						  toggled="false"/>
-				<menuitem id="SubMenu3_3"
+				<menuitem id="SubMenu3_2"
 						  label="层级(L)"
 						  type="check"
 						  toggled="true"/>
-				<menuitem id="SubMenu3_2"
+				<menuitem id="SubMenu3_3"
 						  label="事件(E)"
 						  type="check"
 						  toggled="true"/>
-				<menuitem id="SubMenu3_3"
+				<menuitem id="SubMenu3_4"
 						  label="素材(L)"
 						  type="check"
 						  toggled="true"/>
 				<menuitem type="separator"/>
 				<menuitem id="SubMenu3_5"
 						  label="重置布局(R)"
+						  type="normal"/>
+				<menuitem type="separator"/>
+				<menuitem id="SubMenu3_6"
+						  label="显示数据(D)"
 						  type="normal"/>
 			</menuitem>
 			<menuitem id="menu4"
@@ -114,16 +119,40 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import data.GlobalData;
-
+			import com.xskip.rainbow.editor.data.GlobalData;
+			import com.xskip.rainbow.editor.windows.WinNewProject;
+			
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
 			import mx.managers.PopUpManager;
-
-			import panel.CreateNewProject;
-
-			import windows.WinNewProject;
-
+			
+			public var _CreateNewProject:WinNewProject;
+			
+			private function init():void {
+				trace("game init");
+				_CreateNewProject=new WinNewProject();
+				_CreateNewProject.addEventListener(Event.REMOVED, onCloseHandler);
+			}
+			
+			private function onCloseHandler(e:Event):void {
+				if (e.target==_CreateNewProject){
+					trace("_CreateNewProject onCloseHandler");
+					if (GlobalData.DATA_READY){
+						updateData();
+					}
+				}
+			}
+			
+			private function updateData():void{
+				this.input_tile_number_width.text = String(GlobalData.WIDTH_TILE_NUMBER);
+				this.input_tile_number_height.text = String(GlobalData.HEIGHT_TILE_NUMBER);
+				
+				this.input_view_width.text = String(GlobalData.WIDTH_SCREEN_PIXEL);
+				this.input_view_height.text = String(GlobalData.HEIGHT_SCREEN_PIXEL);
+				
+				this.input_tile_pixel_width.text = String(GlobalData.WIDTH_TILE_PIXEL);
+				this.input_tile_pixel_height.text = String(GlobalData.HEIGHT_TILE_PIXEL);
+			}
 
 			protected function menuBar_ClickHandler(event:MenuEvent):void
 			{
@@ -140,8 +169,7 @@
 							Alert.show("请先保存您的应用");
 							return;
 						}
-						var fCreateNewProject:WinNewProject=new WinNewProject();
-						PopUpManager.addPopUp(fCreateNewProject, this, true);
+						PopUpManager.addPopUp(_CreateNewProject, this, true);
 						//fCreateNewProject.visible = true;
 						break;
 					case "SubMenu5_2_1":
@@ -169,8 +197,63 @@
 				itemClick="menuBar_ClickHandler(event)">
 
 	</mx:MenuBar>
-	<s:RadioButton x="62"
-				   y="84"
-				   label="单选框"/>
+	<s:Group x="10" y="30" width="980" height="760">
+	</s:Group>
+	<mx:Accordion width="200" height="100%" right="0" top="22" >
+		<s:NavigatorContent label="全局参数" width="100%" height="140" maxHeight="400">
+			<s:TextInput id="input_tile_number_width"
+						 x="90"
+						 y="10"
+						 width="40"
+						 text="0"
+						 restrict="0-9\."/>
+			<s:TextInput id="input_tile_number_height"
+						 x="150"
+						 y="10"
+						 width="40"
+						 text="0"
+						 restrict="0-9\."/>
+			<s:Label x="12"
+					 y="15"
+					 text="网格数量"/>
+			<s:TextInput id="input_view_width"
+						 x="90"
+						 y="40"
+						 width="40"
+						 text="800"
+						 restrict="0-9\."/>
+			<s:TextInput id="input_view_height"
+						 x="150"
+						 y="40"
+						 width="40"
+						 text="600"
+						 restrict="0-9\."/>
+			<s:Label x="12"
+					 y="45"
+					 text="显示域"/>
+			<s:TextInput id="input_tile_pixel_width"
+						 x="90"
+						 y="70"
+						 width="40"
+						 text="32"
+						 restrict="0-9\."/>
+			<s:TextInput id="input_tile_pixel_height"
+						 x="150"
+						 y="70"
+						 width="40"
+						 text="32"
+						 restrict="0-9\."/>
+			<s:Label x="12"
+					 y="75"
+					 text="单网格"/>
+			<s:Button x="90" y="100" label="更  新" width="98" height="30"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="层级" width="100%" height="400" maxHeight="400">
+		</s:NavigatorContent>
+		<s:NavigatorContent label="事件" width="100%" height="400" maxHeight="400">
+		</s:NavigatorContent>
+		<s:NavigatorContent label="素材" width="100%" height="400" maxHeight="400">
+		</s:NavigatorContent>
+	</mx:Accordion>
 	<!-- 组建 end -->
 </s:WindowedApplication>
