@@ -12,8 +12,6 @@
 		<s:BasicLayout/>
 	</s:layout>
 
-
-
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
@@ -97,13 +95,13 @@
 					 x="110"
 					 y="15"
 					 width="70"
-					 text="800"
+					 text="980"
 					 restrict="0-9\."/>
 		<s:TextInput id="input_view_height"
 					 x="300"
 					 y="15"
 					 width="70"
-					 text="600"
+					 text="750"
 					 restrict="0-9\."/>
 		<s:Label x="14"
 				 y="20"

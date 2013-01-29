@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="180" height="40" contentBackgroundColor="0xFFFF00" rollOverColor="#FFB400" initialize="initHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			[Embed("../asset/icon/tabicons_103.gif")]
+			protected const ICON:Class;
+			
+			public var _id:String;
+			
+			protected function initHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				this.addEventListener(MouseEvent.ROLL_OVER,onRollOverHandler);
+				this.addEventListener(MouseEvent.ROLL_OUT,onRollOutHandler);
+			}
+			
+			private function onRollOverHandler(e:Event):void{
+				gbColorRect.alpha=0.8;
+			}
+			
+			private function onRollOutHandler(e:Event):void{
+				gbColorRect.alpha=0.5;
+			}
+			
+			public function start(str:String=""):void{
+				this.mouseEnabled = true;
+				
+				selectCheck(true);
+				
+				this.layerName.label = str;
+				
+			}
+			
+			public function selectCheck(bln:Boolean):void{
+				
+				this.layerName.selected = true;
+				
+				if (bln){
+					color01.color=0xFF00FF;
+					color02.color=0x990099;
+				}else{
+					color01.color=0x222222;
+					color02.color=0xdddddd;
+				}
+			}
+
+			
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Rect id="gbColorRect" alpha="0.5" x="0" y="0" width="100%" height="100%"> 
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry id="color01" color="0x222222" ratio="0"/>
+				<s:GradientEntry id="color02" color="0xdddddd" ratio="1"/>
+			</s:LinearGradient> 
+		</s:fill> 
+	</s:Rect> 
+
+	<s:Button x="114" y="5" label="" width="60" height="30" icon="@Embed(source='asset/icon/tabicons_103.gif')"/>
+	<s:CheckBox id="layerName" x="10" y="12" label="层名称"/>
+</s:Group>

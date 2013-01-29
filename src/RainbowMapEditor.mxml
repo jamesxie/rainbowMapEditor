@@ -7,7 +7,8 @@
 					   backgroundColor="0x666666"
 					   showStatusBar="false"
 					   backgroundAlpha="0"
-					   creationComplete="init()">
+					   frameRate="60"
+					   creationComplete="init()" xmlns:components="com.xskip.rainbow.editor.components.*">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<fx:XMLList id="myXMLListMenuBar"
@@ -119,19 +120,76 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.components.ViewLayer;
 			import com.xskip.rainbow.editor.data.GlobalData;
+			import com.xskip.rainbow.editor.map.MainStarling;
 			import com.xskip.rainbow.editor.windows.WinNewProject;
 			
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
 			import mx.managers.PopUpManager;
 			
+			import starling.core.Starling;
+			
 			public var _CreateNewProject:WinNewProject;
 			
+			public var _starling:Starling;
+			
+			
+			private var _commViewLayer01:ViewLayer;
+			private var _commViewLayer02:ViewLayer;
+			private var _commViewLayer03:ViewLayer;
+			/*
+			private var _commViewLayer04:ViewLayer;
+			private var _commViewLayer05:ViewLayer;
+			private var _commViewLayer06:ViewLayer;
+			private var _commViewLayer07:ViewLayer;
+			private var _commViewLayer08:ViewLayer;
+			private var _commViewLayer09:ViewLayer;
+			private var _commViewLayer10:ViewLayer;
+			private var _commViewLayer11:ViewLayer;
+			*/
+			
 			private function init():void {
+				if (stage) {
+					start();
+				}else {
+					addEventListener(Event.ADDED_TO_STAGE, start);
+				}
+			}
+			
+			private function start(e:Event = null):void{
+				if (hasEventListener(Event.ADDED_TO_STAGE)) {
+					removeEventListener(Event.ADDED_TO_STAGE, start);
+				}
+				
+				stage.scaleMode = StageScaleMode.NO_SCALE;
+				stage.align = StageAlign.TOP_LEFT;
+				
+				GlobalData.STAGE=stage;
+				
 				trace("game init");
 				_CreateNewProject=new WinNewProject();
 				_CreateNewProject.addEventListener(Event.REMOVED, onCloseHandler);
+			}
+			
+			private function startStarling():void{
+				
+				var fRectangle:Rectangle=new Rectangle(10,40,GlobalData.WIDTH_SCREEN_PIXEL,GlobalData.HEIGHT_SCREEN_PIXEL);
+				
+				//_starling.stage.bounds=fRectangle;
+				
+				_starling = new Starling(MainStarling, GlobalData.STAGE,fRectangle);
+				_starling.antiAliasing = 2;
+				_starling.enableErrorChecking = false;
+				_starling.showStats = true;
+				
+				GlobalData.WORLD=_starling;
+				
+				_starling.stage.color=0x333333;
+				
+				_starling.start();
+				
 			}
 			
 			private function onCloseHandler(e:Event):void {
@@ -152,6 +210,46 @@
 				
 				this.input_tile_pixel_width.text = String(GlobalData.WIDTH_TILE_PIXEL);
 				this.input_tile_pixel_height.text = String(GlobalData.HEIGHT_TILE_PIXEL);
+				
+				
+				//_starling.stage.width = GlobalData.WIDTH_SCREEN_PIXEL;
+				//_starling.stage.height = GlobalData.HEIGHT_SCREEN_PIXEL;
+				
+				
+				initComm();
+				
+				startStarling();
+				
+				trace("_starling.stage = "+_starling.stage);
+				
+				
+				
+				
+			}
+			
+			private function initComm():void {
+				var fFixX:int=4;
+				var fFixY:int=4;
+				
+				_commViewLayer01=new ViewLayer();
+				_commViewLayer01.x=fFixX;
+				_commViewLayer01.y=fFixY+(_commViewLayer01.height+fFixY)*0;
+				_commViewLayer01.start('网格层');
+				layer_LAYER_TILE_CELL.addElement(_commViewLayer01);
+				
+				_commViewLayer02=new ViewLayer();
+				_commViewLayer02.x=fFixX;
+				_commViewLayer02.y=fFixY+(_commViewLayer02.height+fFixY)*1;
+				_commViewLayer02.start('背景卷轴1');
+				layer_LAYER_TILE_CELL.addElement(_commViewLayer02);
+				
+				_commViewLayer03=new ViewLayer();
+				_commViewLayer03.x=fFixX;
+				_commViewLayer03.y=fFixY+(_commViewLayer03.height+fFixY)*2;
+				_commViewLayer03.start('背景卷轴2');
+				layer_LAYER_TILE_CELL.addElement(_commViewLayer03);
+				
+				
 			}
 
 			protected function menuBar_ClickHandler(event:MenuEvent):void
@@ -192,6 +290,7 @@
 				y="0"
 				width="100%"
 				id="_menuBar"
+				height="30"
 				dataProvider="{myXMLListMenuBar}"
 				labelField="@label"
 				itemClick="menuBar_ClickHandler(event)">
@@ -199,8 +298,8 @@
 	</mx:MenuBar>
 	<s:Group x="10" y="30" width="980" height="760">
 	</s:Group>
-	<mx:Accordion width="200" height="100%" right="0" top="22" >
-		<s:NavigatorContent label="全局参数" width="100%" height="140" maxHeight="400">
+	<mx:Accordion width="200" height="100%" right="0" top="30" headerHeight="30">
+		<s:NavigatorContent label="全局参数" width="100%" height="140" maxHeight="400" >
 			<s:TextInput id="input_tile_number_width"
 						 x="90"
 						 y="10"
@@ -248,7 +347,7 @@
 					 text="单网格"/>
 			<s:Button x="90" y="100" label="更  新" width="98" height="30"/>
 		</s:NavigatorContent>
-		<s:NavigatorContent label="层级" width="100%" height="400" maxHeight="400">
+		<s:NavigatorContent id="layer_LAYER_TILE_CELL" label="层级" width="100%" height="400" maxHeight="400">
 		</s:NavigatorContent>
 		<s:NavigatorContent label="事件" width="100%" height="400" maxHeight="400">
 		</s:NavigatorContent>
