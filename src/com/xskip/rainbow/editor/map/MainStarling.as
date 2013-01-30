@@ -86,6 +86,9 @@ package com.xskip.rainbow.editor.map
 		private function init_LAYER_TILE_CELL():void{
 			var fSprite:Sprite=Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(GlobalData.LAYER_TILE_CELL));
 			
+			//透明度
+			fSprite.alpha=0.5;
+			
 			//TODO 以后变更为真正场景宽高
 			var fWNum:int = int(GlobalData.WIDTH_SCREEN_PIXEL/GlobalData.WIDTH_TILE_PIXEL)+1;
 			var fHNum:int = int(GlobalData.HEIGHT_SCREEN_PIXEL/GlobalData.HEIGHT_TILE_PIXEL)+1;
