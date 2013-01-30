@@ -1,57 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="180" height="40" contentBackgroundColor="0xFFFF00" rollOverColor="#FFB400" initialize="initHandler(event)">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="190" height="30" contentBackgroundColor="0xFFFF00" rollOverColor="#FFB400" initialize="initHandler(event)">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
-			[Embed("../asset/icon/tabicons_103.gif")]
-			protected const ICON:Class;
 			
-			public var _id:String;
+			[Embed(source='asset/icon/XiaoIcon_041.png')]
+			protected const ICON:Class;
+
+			private var _key:String;
+			
+			private var _funCallBack:Function;
 			
 			protected function initHandler(event:FlexEvent):void
 			{
 				// TODO Auto-generated method stub
 				this.addEventListener(MouseEvent.ROLL_OVER,onRollOverHandler);
 				this.addEventListener(MouseEvent.ROLL_OUT,onRollOutHandler);
+				
+				btnEdit.addEventListener(MouseEvent.CLICK,onEditButtonHandler);
 			}
 			
-			private function onRollOverHandler(e:Event):void{
-				gbColorRect.alpha=0.8;
+			private function onRollOverHandler(e:MouseEvent):void{
+				gbColorRect.alpha = 0.3;
 			}
 			
-			private function onRollOutHandler(e:Event):void{
-				gbColorRect.alpha=0.5;
+			private function onRollOutHandler(e:MouseEvent):void{
+				gbColorRect.alpha = 0.6;
 			}
 			
-			public function start(str:String=""):void{
+			private function onEditButtonHandler(e:MouseEvent):void{
+				_funCallBack(_key,"edit");
+			}
+			
+			private function changeHandler(e:Event):void{
+				var fBln:Boolean=layerName.selected;
+				selectShow(fBln);
+				_funCallBack(_key,"show");
+			}
+			
+			public function start(str:String="",key:String="",fun:Function=null):void{
 				this.mouseEnabled = true;
 				
-				selectCheck(true);
+				selectShow(true);
+				
+				selectEdit(false);
 				
 				this.layerName.label = str;
 				
+				this._key=key;
+				
+				this._funCallBack=fun;
+				
+				
+				
+				
+				//XXX 随机显示图标
+				/*var fInt:int=Math.floor(Math.random()*100);
+				trace("fInt = "+fInt);
+				
+				if (fInt<50){
+					selectEdit(false);
+				}else{
+					selectEdit(true);
+				}*/
+				//XXX 
 			}
 			
-			public function selectCheck(bln:Boolean):void{
+			public function selectShow(bln:Boolean):void{
 				
-				this.layerName.selected = true;
+				//this.layerName.selected = true;
 				
 				if (bln){
-					color01.color=0xFF00FF;
-					color02.color=0x990099;
+					color01.color=0x2E5290;
+					color02.color=0x5871A7;
 				}else{
-					color01.color=0x222222;
-					color02.color=0xdddddd;
+					color01.color=0x799ED2;
+					color02.color=0xA5B8E3;
 				}
 			}
-
 			
-
+			public function selectEdit(bln:Boolean=true):void{
+				if (bln){
+					btnEdit.setStyle("icon",ICON);
+				}else{
+					btnEdit.setStyle("icon","");
+				}
+				
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -60,12 +100,12 @@
 	<s:Rect id="gbColorRect" alpha="0.5" x="0" y="0" width="100%" height="100%"> 
 		<s:fill>
 			<s:LinearGradient rotation="90">
-				<s:GradientEntry id="color01" color="0x222222" ratio="0"/>
-				<s:GradientEntry id="color02" color="0xdddddd" ratio="1"/>
-			</s:LinearGradient> 
-		</s:fill> 
-	</s:Rect> 
+				<s:GradientEntry id="color01" color="0x2E5290" ratio="0"/>
+				<s:GradientEntry id="color02" color="0x5871A7" ratio="1"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
 
-	<s:Button x="114" y="5" label="" width="60" height="30" icon="@Embed(source='asset/icon/tabicons_103.gif')"/>
-	<s:CheckBox id="layerName" x="10" y="12" label="层名称"/>
+	<s:Button id="btnEdit" x="146" y="3" label="" width="40" height="24" icon="{ICON}"/>
+	<s:CheckBox id="layerName" x="10" y="6" label="层名称" color="#24327A" change="changeHandler(event)" selected="true"/>
 </s:Group>

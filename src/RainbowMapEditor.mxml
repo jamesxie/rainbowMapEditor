@@ -124,6 +124,7 @@
 			import com.xskip.rainbow.editor.data.GlobalData;
 			import com.xskip.rainbow.editor.map.MainStarling;
 			import com.xskip.rainbow.editor.windows.WinNewProject;
+			import com.xskip.utils.HashMap;
 			
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
@@ -139,7 +140,6 @@
 			private var _commViewLayer01:ViewLayer;
 			private var _commViewLayer02:ViewLayer;
 			private var _commViewLayer03:ViewLayer;
-			/*
 			private var _commViewLayer04:ViewLayer;
 			private var _commViewLayer05:ViewLayer;
 			private var _commViewLayer06:ViewLayer;
@@ -148,7 +148,8 @@
 			private var _commViewLayer09:ViewLayer;
 			private var _commViewLayer10:ViewLayer;
 			private var _commViewLayer11:ViewLayer;
-			*/
+			
+			private var _hashMapViewLayer:HashMap;
 			
 			private function init():void {
 				if (stage) {
@@ -228,28 +229,62 @@
 			}
 			
 			private function initComm():void {
+				_hashMapViewLayer=new HashMap();
+
+				createViewLayer(_commViewLayer01,10,"远背景",GlobalData.LAYER_BACKGROUND);
+				createViewLayer(_commViewLayer02,9,"背景卷轴1",GlobalData.LAYER_BACKGROUND_SCROLL_01);
+				createViewLayer(_commViewLayer03,8,"背景卷轴2",GlobalData.LAYER_BACKGROUND_SCROLL_02);
+				createViewLayer(_commViewLayer04,7,"地面背景",GlobalData.LAYER_FLOOR_BACKGROUND);
+				createViewLayer(_commViewLayer05,6,"地面背景修饰",GlobalData.LAYER_FLOOR_GARDEN);
+				createViewLayer(_commViewLayer06,5,"地面",GlobalData.LAYER_FLOOR);
+				createViewLayer(_commViewLayer07,4,"地面热区",GlobalData.LAYER_HOT_FLOOR);
+				createViewLayer(_commViewLayer08,3,"楼梯",GlobalData.LAYER_LADDER);
+				createViewLayer(_commViewLayer09,2,"楼梯热区",GlobalData.LAYER_HOT_LADDER);
+				createViewLayer(_commViewLayer10,1,"事件热区",GlobalData.LAYER_HOT_EVENT);
+				createViewLayer(_commViewLayer11,0,"网格层",GlobalData.LAYER_TILE_CELL);
+				
+				
+				
+			}
+			
+			private function createViewLayer(pViewLayer:ViewLayer,pI:int=0,pLabel:String="",strKey:String=""):void {
 				var fFixX:int=4;
 				var fFixY:int=4;
 				
-				_commViewLayer01=new ViewLayer();
-				_commViewLayer01.x=fFixX;
-				_commViewLayer01.y=fFixY+(_commViewLayer01.height+fFixY)*0;
-				_commViewLayer01.start('网格层');
-				layer_LAYER_TILE_CELL.addElement(_commViewLayer01);
+				pViewLayer=new ViewLayer();
+				pViewLayer.x=fFixX;
+				pViewLayer.y=fFixY+(pViewLayer.height+fFixY)*pI;
+				pViewLayer.start(pLabel,strKey,viewLayerCallBack);
+				layer_LAYER_TILE_CELL.addElement(pViewLayer);
 				
-				_commViewLayer02=new ViewLayer();
-				_commViewLayer02.x=fFixX;
-				_commViewLayer02.y=fFixY+(_commViewLayer02.height+fFixY)*1;
-				_commViewLayer02.start('背景卷轴1');
-				layer_LAYER_TILE_CELL.addElement(_commViewLayer02);
+				_hashMapViewLayer.put(strKey,pViewLayer);
 				
-				_commViewLayer03=new ViewLayer();
-				_commViewLayer03.x=fFixX;
-				_commViewLayer03.y=fFixY+(_commViewLayer03.height+fFixY)*2;
-				_commViewLayer03.start('背景卷轴2');
-				layer_LAYER_TILE_CELL.addElement(_commViewLayer03);
+				//默认选中
+				if (strKey==GlobalData.LAYER_FLOOR){
+					pViewLayer.selectEdit(true);
+				}
+			}
+			
+			public function viewLayerCallBack(pStrKey:String="",pType:String=""):void{
+				
+				var fViewLayer:ViewLayer=ViewLayer(_hashMapViewLayer.getValue(pStrKey));
+				
+				if (pType=="show"){
+					//TODO 显示层
+					//Starling.show
+				}
 				
 				
+				
+				if (pType=="edit"){
+					var fLength:int=_hashMapViewLayer.size();
+					
+					for (var i:int=0;i<fLength;i++){
+						ViewLayer(_hashMapViewLayer.values()[i]).selectEdit(false);
+					}
+					fViewLayer.selectEdit(true);
+					layer_LAYER_TILE_CELL.label="图层"+"【"+fViewLayer.layerName.label+"】";
+				}
 			}
 
 			protected function menuBar_ClickHandler(event:MenuEvent):void
@@ -298,7 +333,7 @@
 	</mx:MenuBar>
 	<s:Group x="10" y="30" width="980" height="760">
 	</s:Group>
-	<mx:Accordion width="200" height="100%" right="0" top="30" headerHeight="30">
+	<mx:Accordion width="200" height="100%" right="0" top="30" headerHeight="40">
 		<s:NavigatorContent label="全局参数" width="100%" height="140" maxHeight="400" >
 			<s:TextInput id="input_tile_number_width"
 						 x="90"

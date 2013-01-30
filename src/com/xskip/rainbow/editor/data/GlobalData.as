@@ -37,7 +37,7 @@ package com.xskip.rainbow.editor.data
 		public static const LAYER_BACKGROUND_SCROLL_01:String="LAYER_BACKGROUND_SCROLL_01";
 		//3 背景卷轴2
 		public static const LAYER_BACKGROUND_SCROLL_02:String="LAYER_BACKGROUND_SCROLL_02";
-		//4 地面背景1
+		//4 地面背景
 		public static const LAYER_FLOOR_BACKGROUND:String="LAYER_FLOOR_BACKGROUND";
 		//5 地面背景修饰
 		public static const LAYER_FLOOR_GARDEN:String="LAYER_FLOOR_GARDEN";
