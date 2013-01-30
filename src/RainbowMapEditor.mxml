@@ -269,10 +269,19 @@
 				
 				var fViewLayer:ViewLayer=ViewLayer(_hashMapViewLayer.getValue(pStrKey));
 				
-				if (pType=="show"){
+				/*if (pType=="show"){
 					//TODO 显示层
 					//Starling.show
+					Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(pStrKey)).visible=true;
+					return;
 				}
+				
+				if (pType=="hide"){
+					//TODO 显示层
+					//Starling.show
+					Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(pStrKey)).visible=false;
+					return;
+				}*/
 				
 				
 				

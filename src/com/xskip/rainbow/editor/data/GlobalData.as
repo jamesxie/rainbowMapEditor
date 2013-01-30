@@ -1,5 +1,7 @@
 package com.xskip.rainbow.editor.data
 {
+	import com.xskip.utils.HashMap;
+	
 	import flash.display.Stage;
 	
 	import starling.core.Starling;
@@ -26,9 +28,18 @@ package com.xskip.rainbow.editor.data
 		//层名称
 		public static var LAYER_NAME:Vector.<String>;
 		
+		
+		//---------------- starling变量 ----------------
+		
+		//所有的图层
+		public static var DISPLAY_ALL_SPRITE:HashMap;
+		
 		//---------------- 数据变量 ----------------
 		
 		public static var DATA_READY:Boolean = false;
+		
+		//当前选中层
+		public static var SELECTED_LAYER:String="";
 		
 		//---------------- 层级常量 ----------------
 		//1 远背景

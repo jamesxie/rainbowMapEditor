@@ -1,68 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="190" height="30" contentBackgroundColor="0xFFFF00" rollOverColor="#FFB400" initialize="initHandler(event)">
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="190"
+		 height="30"
+		 contentBackgroundColor="0xFFFF00"
+		 rollOverColor="#FFB400"
+		 initialize="initHandler(event)">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.data.GlobalData;
+
 			import mx.events.FlexEvent;
-			
+
+			import starling.display.Sprite;
+
 			[Embed(source='asset/icon/XiaoIcon_041.png')]
 			protected const ICON:Class;
 
 			private var _key:String;
-			
+
 			private var _funCallBack:Function;
-			
+
 			protected function initHandler(event:FlexEvent):void
 			{
 				// TODO Auto-generated method stub
-				this.addEventListener(MouseEvent.ROLL_OVER,onRollOverHandler);
-				this.addEventListener(MouseEvent.ROLL_OUT,onRollOutHandler);
-				
-				btnEdit.addEventListener(MouseEvent.CLICK,onEditButtonHandler);
+				this.addEventListener(MouseEvent.ROLL_OVER, onRollOverHandler);
+				this.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
+
+				btnEdit.addEventListener(MouseEvent.CLICK, onEditButtonHandler);
 			}
-			
-			private function onRollOverHandler(e:MouseEvent):void{
-				gbColorRect.alpha = 0.3;
+
+			private function onRollOverHandler(e:MouseEvent):void
+			{
+				gbColorRect.alpha=0.3;
 			}
-			
-			private function onRollOutHandler(e:MouseEvent):void{
-				gbColorRect.alpha = 0.6;
+
+			private function onRollOutHandler(e:MouseEvent):void
+			{
+				gbColorRect.alpha=0.6;
 			}
-			
-			private function onEditButtonHandler(e:MouseEvent):void{
-				_funCallBack(_key,"edit");
+
+			private function onEditButtonHandler(e:MouseEvent):void
+			{
+				_funCallBack(_key, "edit");
 			}
-			
-			private function changeHandler(e:Event):void{
+
+			private function changeHandler(e:Event):void
+			{
 				var fBln:Boolean=layerName.selected;
 				selectShow(fBln);
-				_funCallBack(_key,"show");
+
+				if (fBln)
+				{
+					starling.display.Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(_key)).visible=true;
+				}
+				else
+				{
+					starling.display.Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(_key)).visible=false;
+				}
+
+				/*if (fBln){
+					_funCallBack(_key,"show");
+				}else{
+					_funCallBack(_key,"hide");
+				}*/
 			}
-			
-			public function start(str:String="",key:String="",fun:Function=null):void{
-				this.mouseEnabled = true;
-				
+
+			public function start(str:String="", key:String="", fun:Function=null):void
+			{
+				this.mouseEnabled=true;
+
 				selectShow(true);
-				
+
 				selectEdit(false);
-				
-				this.layerName.label = str;
-				
+
+				this.layerName.label=str;
+
 				this._key=key;
-				
+
 				this._funCallBack=fun;
-				
-				
-				
-				
+
+
+
+
 				//XXX 随机显示图标
 				/*var fInt:int=Math.floor(Math.random()*100);
 				trace("fInt = "+fInt);
-				
+	
 				if (fInt<50){
 					selectEdit(false);
 				}else{
@@ -70,42 +98,71 @@
 				}*/
 				//XXX 
 			}
-			
-			public function selectShow(bln:Boolean):void{
-				
+
+			public function selectShow(bln:Boolean):void
+			{
+
 				//this.layerName.selected = true;
-				
-				if (bln){
+
+				if (bln)
+				{
 					color01.color=0x2E5290;
 					color02.color=0x5871A7;
-				}else{
+				}
+				else
+				{
 					color01.color=0x799ED2;
 					color02.color=0xA5B8E3;
 				}
 			}
-			
-			public function selectEdit(bln:Boolean=true):void{
-				if (bln){
-					btnEdit.setStyle("icon",ICON);
-				}else{
-					btnEdit.setStyle("icon","");
+
+			public function selectEdit(bln:Boolean=true):void
+			{
+				if (bln)
+				{
+					btnEdit.setStyle("icon", ICON);
 				}
-				
+				else
+				{
+					btnEdit.setStyle("icon", "");
+				}
+
 			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:Rect id="gbColorRect" alpha="0.5" x="0" y="0" width="100%" height="100%"> 
+	<s:Rect id="gbColorRect"
+			alpha="0.5"
+			x="0"
+			y="0"
+			width="100%"
+			height="100%">
 		<s:fill>
 			<s:LinearGradient rotation="90">
-				<s:GradientEntry id="color01" color="0x2E5290" ratio="0"/>
-				<s:GradientEntry id="color02" color="0x5871A7" ratio="1"/>
+				<s:GradientEntry id="color01"
+								 color="0x2E5290"
+								 ratio="0"/>
+				<s:GradientEntry id="color02"
+								 color="0x5871A7"
+								 ratio="1"/>
 			</s:LinearGradient>
 		</s:fill>
 	</s:Rect>
 
-	<s:Button id="btnEdit" x="146" y="3" label="" width="40" height="24" icon="{ICON}"/>
-	<s:CheckBox id="layerName" x="10" y="6" label="层名称" color="#24327A" change="changeHandler(event)" selected="true"/>
+	<s:Button id="btnEdit"
+			  x="146"
+			  y="3"
+			  label=""
+			  width="40"
+			  height="24"
+			  icon="{ICON}"/>
+	<s:CheckBox id="layerName"
+				x="10"
+				y="6"
+				label="层名称"
+				color="#24327A"
+				change="changeHandler(event)"
+				selected="true"/>
 </s:Group>
