@@ -1,20 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="500">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="500" initialize="initHandler(event);">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.event.EventCenter;
+			import com.xskip.rainbow.editor.event.EventType;
+			import com.xskip.rainbow.editor.event.JEvent;
+			import com.xskip.utils.StringUtil;
+			
+			import mx.core.Application;
+			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			
+			import spark.components.Image;
+			import spark.skins.spark.ImageSkin;
+			
 			private var _isRun:Boolean;
+			private var _assetPath:String;
+			private var _imageDrag:Image;
+			private var _imageDragFixX:int;
+			private var _imageDragFixY:int;
+			private var _onDrag:Boolean;
+			private var _callBack:Function;
+			
+			public function start(pFun:Function):void{
+				_callBack = pFun;
+			}
 			
 			protected function initHandler(event:FlexEvent):void
 			{
 				// TODO Auto-generated method stub
+				_assetPath = "";
+				
+				//拖动素材
+				_imageDrag = new Image();
+				_imageDrag.alpha = 0.3;
+				_imageDrag.mouseEnabled = false;
+				_onDrag = false;
+				_imageDragFixX = 0;
+				_imageDragFixY = 0;
+				//_imageDrag.visible = false;
+				
+				//
+				//stage.addChild(_imageDrag);
 				
 			}
 
@@ -27,23 +60,207 @@
 			protected function addtoStageHandler(event:Event):void
 			{
 				// TODO Auto-generated method stub
-				_isRun=false;
+				_isRun = false;
 				
-				var fFile:File=File.applicationDirectory.resolvePath("assets/");
-				fileSystemTree.directory=fFile;
+				var fFile:File = File.applicationDirectory.resolvePath("assets/");
+				fileSystemTree.directory = fFile;
 			}
+			
+			private function btnShowAssetHandler(event:Event):void{
+				var fPath:String = fileSystemTree.selectedPath;
+				
+				//trace("fPath 1 = "+fPath);
+				
+				var fFile:File = File.applicationDirectory;
+				var fHomePath:String = fFile.nativePath;
+				if (fPath){
+					fPath = StringUtil.replace(fPath,fHomePath,"");
+					//剔除多余的'/'符号
+					fPath = fPath.slice(1,fPath.length);
+					//trace("fPath 2 = "+fPath);
+					
+					_assetPath = fPath;
+					
+					//选择菜单1
+					fileMenu.selectedIndex=0;
+					//显示各类图片
+					showImageList();
+				}
+			}
+			
+			private function showImageList():void{
+				if (fileAssetView.numElements>0){
+					//TODO 回收监听
+					fileAssetView.removeAllElements();
+					
+				}
+				
+				var fFile:File = File.applicationDirectory.resolvePath(_assetPath);
+				
+				//trace("fFile = " + fFile.nativePath);
+				
+				//images文件夹下的目录或者文件存储到userDireFiles数组-----同步处理
+				var userDirFiles:Array = fFile.getDirectoryListing();
+				
+				//trace("userDirFiles = "+userDirFiles);
+				//trace("userDirFiles.length = "+userDirFiles.length);
+				
+				//过滤 文件夹和非图片
+				userDirFiles=userDirFiles.filter(isPic);
+				
+				//trace("userDirFiles.length = "+userDirFiles.length);
+				
+				for (var i:int = 0; i < userDirFiles.length; i++) 
+				{
+					//trace(userDirFiles.length)
+					//获取images文件夹下的目录或者文件的名字
+					//trace(userDirFiles[i].name);
+					var fTempFile:File=File(userDirFiles[i]);
+					
+					if (fTempFile.isDirectory)
+					{
+						//trace("过滤目录");
+					}else{
+						//trace(fTempFile.name);
+						var fImage:Image=new Image();
+						//trace("fTempFile.data "+fTempFile.data);
+						var myBitmap:Bitmap = new Bitmap(BitmapData(fTempFile.data));
+						//.icon.bitmaps[0] );
+						//fImage.source = "{File(userDirFiles[i]).data}";
+						fImage.source= fTempFile.nativePath;
+						
+						fImage.addEventListener(MouseEvent.MOUSE_DOWN,onImageDownHandler);
+						fImage.x = 5;
+						fImage.y = 5;
+						
+						//fImage.width=myBitmap.width;
+						//fImage.height=myBitmap.height;
+						
+						fileAssetView.addElement(fImage);
+					}
+					
+				}
 
+			}
+			
+			private function onImageDownHandler(e:MouseEvent):void{
+				
+				
+				_imageDragFixX=e.localX;
+				_imageDragFixY=e.localY;
+				
+				trace("e.target = "+e.currentTarget);
+				
+				if (e.currentTarget as Image){
+					var fImage:Image=Image(e.currentTarget);
+					
+					_imageDrag.source = fImage.source;
+					_imageDrag.width = fImage.width;
+					_imageDrag.height = fImage.height;
+					
+					updateImageDragXY();
+					
+					FlexGlobals.topLevelApplication.addElement(_imageDrag);
+					//_imageDrag.visible = true;
+					
+					stage.addEventListener(MouseEvent.MOUSE_UP,onImageUpHandler);
+					stage.addEventListener(MouseEvent.MOUSE_MOVE,onImageMoveHandler);
+					
+				}else{
+					return;
+				}
+				
+			}
+			
+			private function onImageMoveHandler(e:MouseEvent):void{
+				updateImageDragXY();
+			}
+			
+			private function updateImageDragXY():void{
+				_imageDrag.x = stage.mouseX-_imageDragFixX;
+				_imageDrag.y = stage.mouseY-_imageDragFixY;
+				
+				//trace("_imageDrag.x "+_imageDrag.x+" _imageDrag.y "+_imageDrag.y);
+			}
+			
+			private function onImageUpHandler(e:MouseEvent):void{
+				if (stage.hasEventListener(MouseEvent.MOUSE_MOVE)){
+					stage.removeEventListener(MouseEvent.MOUSE_MOVE,onImageMoveHandler);
+				}
+				
+				if (stage.hasEventListener(MouseEvent.MOUSE_UP)){
+					stage.removeEventListener(MouseEvent.MOUSE_UP,onImageUpHandler);
+				}
+
+				//TODO 回调starling传参方法
+				
+				//_imageDrag.visible=false;
+				
+				//if (_callBack){
+					//_callBack();
+				//}
+				
+				EventCenter.dispatcher.dispatchEvent(new JEvent(EventType.EVENT_CHANGE_IMAGE,_imageDrag.bitmapData));
+				
+				
+				FlexGlobals.topLevelApplication.removeElement(_imageDrag);
+			}
+			
+			private function isPic(element:*,index:int,arr:Array):Boolean{
+				//过滤文件夹的文件，将指定格式的图片挑出来
+				if (!element){
+					return false;
+				}
+				
+				//过滤目录
+				if (element is File){
+					if (File(element).isDirectory){
+						return false;
+					}
+				}
+				
+				if( element.type.toLowerCase()==".jpg" || 
+					element.type.toLowerCase()==".jpeg" || 
+					element.type.toLowerCase()==".gif" || 
+					element.type.toLowerCase()==".png"){
+					return true;
+				}else{				
+					return false;
+				}
+
+			}
+			
+			private function filterFunctionHandler(file:File):Boolean{
+				if( !file.extension )
+					return true;
+				
+				var fname:String = file.extension.toLowerCase();
+				//if( fname == "jpg" || fname == "png" || fname == "gif" )
+				if( fname == "")
+					return true;
+				else
+					return false;
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<mx:TabNavigator x="0" y="0" width="200" height="200">
-		<s:NavigatorContent label="素材浏览" width="100%" height="100%">
-			
+	<mx:TabNavigator id="fileMenu" x="0" y="0" width="200" height="100%">
+		<s:NavigatorContent label="素材编辑" width="100%" height="100%">
+			<s:Scroller id="scrllr"
+						focusEnabled="false"
+						hasFocusableChildren="true"
+						width="100%" height="100%"
+						horizontalCenter="0" verticalCenter="0">
+				<s:VGroup id="fileAssetView" x="0" y="0" width="100%" height="100%">
+				</s:VGroup>
+			</s:Scroller>
 		</s:NavigatorContent>
 		<s:NavigatorContent label="目录" width="100%" height="100%">
-			<mx:FileSystemTree addedToStage="addtoStageHandler(event)" id="fileSystemTree" width="100%" height="100%" change="onChangeHandler(event)"/> 
+			<mx:FileSystemTree  id="fileSystemTree" filterFunction="filterFunctionHandler" addedToStage="addtoStageHandler(event)" horizontalScrollPolicy="on" verticalScrollPolicy="auto" width="100%" height="300" change="onChangeHandler(event)"/> 
+			<s:Button x="10" y="310" label="显示素材" width="180" height="40" click="btnShowAssetHandler(event);"/>
 		</s:NavigatorContent>
 	</mx:TabNavigator>
 </s:Group>

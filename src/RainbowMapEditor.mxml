@@ -122,6 +122,8 @@
 		<![CDATA[
 			import com.xskip.rainbow.editor.components.ViewLayer;
 			import com.xskip.rainbow.editor.data.GlobalData;
+			import com.xskip.rainbow.editor.event.EventCenter;
+			import com.xskip.rainbow.editor.event.JEvent;
 			import com.xskip.rainbow.editor.map.MainStarling;
 			import com.xskip.rainbow.editor.windows.WinNewProject;
 			import com.xskip.utils.HashMap;
@@ -267,6 +269,17 @@
 				}
 			}
 			
+			private function initViewAssetHandler():void{
+				//_ViewAsset.start(viewAssetCallBack);
+			}
+			
+			/*public function viewAssetCallBack(type:String,bitmap:Bitmap=null):void{
+				if (type==""){
+					
+					return;
+				}
+			}*/
+			
 			public function viewLayerCallBack(pStrKey:String="",pType:String=""):void{
 				
 				var fViewLayer:ViewLayer=ViewLayer(_hashMapViewLayer.getValue(pStrKey));
@@ -398,7 +411,7 @@
 		<s:NavigatorContent label="事件" width="100%" height="400" maxHeight="400">
 		</s:NavigatorContent>
 		<s:NavigatorContent label="素材" width="100%" height="400" maxHeight="400">
-			<components:ViewAsset>		
+			<components:ViewAsset id="_ViewAsset" initialize="initViewAssetHandler()">		
 			</components:ViewAsset>
 		</s:NavigatorContent>
 	</mx:Accordion>
