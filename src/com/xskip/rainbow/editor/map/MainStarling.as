@@ -6,12 +6,13 @@ package com.xskip.rainbow.editor.map
 	import com.xskip.rainbow.editor.event.JEvent;
 	import com.xskip.utils.HashMap;
 	import com.xskip.utils.StarlingLine;
-
+	
 	import flash.display.BitmapData;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
-
+	
 	import mx.controls.Text;
-
+	
 	import starling.display.Image;
 	import starling.display.Quad;
 	import starling.display.Sprite;
@@ -33,6 +34,14 @@ package com.xskip.rainbow.editor.map
 
 		private var _mouseX:Number;
 		private var _mouseY:Number;
+		
+		private var _fixX:int;
+		private var _fixY:int;
+		private var _fixW:int;
+		private var _fixH:int;
+		
+		//TODO  2013-2-1素材旋转方向 Matrix
+		private var _direction:int;
 
 
 		//地面贴图合集
@@ -61,18 +70,49 @@ package com.xskip.rainbow.editor.map
 		{
 
 			_hmLAYER_FLOOR=new HashMap();
+			
+			_mouseX = 0;
+			_mouseY = 0;
+			
+			_fixX = GlobalData.WORLD.viewPort.x;
+			_fixY = GlobalData.WORLD.viewPort.y;
+			_fixW = GlobalData.WORLD.viewPort.width;
+			_fixH = GlobalData.WORLD.viewPort.height;
+			
+			_direction=0;
 		}
 
 		private function initEventListener():void
 		{
 			//更新坐标位置
-			GlobalData.WORLD.stage.addEventListener(TouchEvent.TOUCH, onTouchHandler);
-
-
+			//GlobalData.WORLD.stage.addEventListener(TouchEvent.TOUCH, onTouchHandler);
+			
+			GlobalData.STAGE.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMoveHandler);
+			
 			EventCenter.dispatcher.addEventListener(EventType.EVENT_CHANGE_IMAGE, onChangeImageHandler);
 		}
-
-
+		
+		//维护鼠标位置
+		private function onMouseMoveHandler(e:MouseEvent):void{
+			mouseX = GlobalData.STAGE.mouseX - _fixX;
+			mouseY = GlobalData.STAGE.mouseY - _fixY;
+			
+			if (mouseX < 0){
+				mouseX = 0;
+			}
+			if (mouseX > _fixW){
+				mouseX = _fixW;
+			}
+			
+			if (mouseY < 0){
+				mouseY = 0;
+			}
+			if (mouseY > _fixH){
+				mouseY = _fixH;
+			}
+			
+		}
+		
 
 		private function onChangeImageHandler(e:JEvent):void
 		{
@@ -85,21 +125,31 @@ package com.xskip.rainbow.editor.map
 				var fImage:Image=new Image(fTexture);
 				fImage.x=fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
 				fImage.y=fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
-
-
+				
+				trace("fImage.x "+fImage.x+" fImage.y "+fImage.y);
+				
 				_spNow.addChild(fImage);
 			}
 		}
 
+		//得到鼠标（所在网格）位置
 		private function getMousePlace():Point
 		{
 			var fPoint:Point=new Point();
+			
+			var fX:Number=mouseX;
+			var fY:Number=mouseY;
 
 			refreshNowSprite();
+			
+			//trace("mouseX "+fX+" GlobalData.WIDTH_TILE_PIXEL "+GlobalData.WIDTH_TILE_PIXEL);
 
-			fPoint.x=int(_mouseX / GlobalData.WIDTH_TILE_PIXEL);
-			fPoint.y=int(_mouseY / GlobalData.HEIGHT_TILE_PIXEL);
-
+			fPoint.x = Math.floor(fX / GlobalData.WIDTH_TILE_PIXEL);
+			fPoint.y = Math.floor(fY / GlobalData.HEIGHT_TILE_PIXEL);
+			
+			//trace("fPoint.x "+fPoint.x);
+			//trace("fPoint.y "+fPoint.y);
+			
 			return fPoint;
 		}
 
@@ -138,6 +188,7 @@ package com.xskip.rainbow.editor.map
 
 			//添加控制层
 			_spControl=new Sprite();
+			_spControl.touchable = true;
 			GlobalData.WORLD.stage.addChild(_spControl);
 
 			//初始化各个图层
@@ -198,22 +249,58 @@ package com.xskip.rainbow.editor.map
 				fSprite.addChild(fHLine);
 			}
 		}
-
-
+		
 		//更新坐标位置 begin
 		private function onTouchHandler(e:TouchEvent):void
 		{
-			var touches:Vector.<Touch>=e.getTouches(this);
-
-			for each (var touch:Touch in touches)
+			//var touches:Vector.<Touch>=e.getTouches(this);
+			
+			var touch:Touch = e.getTouch(GlobalData.WORLD.stage);
+			if (touch){
+				trace("touch.phase = " + touch.phase);
+				
+				/*if (touch.phase == TouchPhase.HOVER){
+					mouseX = touch.globalX;
+					mouseY = touch.globalY;
+					trace("mouseX "+mouseX+" mouseY "+mouseY);
+					return;
+				}
+				if (touch.phase == TouchPhase.ENDED){
+					mouseX = touch.globalX;
+					mouseY = touch.globalY;
+					trace("mouseX "+mouseX+" mouseY "+mouseY);
+					return;
+				}*/
+				if (touch.phase == TouchPhase.MOVED){
+					mouseX = touch.globalX;
+					mouseY = touch.globalY;
+					//trace("mouseX "+mouseX+" mouseY "+mouseY);
+				}
+				if (touch.phase == TouchPhase.HOVER){
+					mouseX = touch.globalX;
+					mouseY = touch.globalY;
+					//trace("mouseX "+mouseX+" mouseY "+mouseY);
+				}
+			}
+			/*for each (var touch:Touch in touches)
 			{
+				var location:Point;
+				
+				trace("touch.phase = "+touch.phase);
+				
 				if (touch.phase == TouchPhase.HOVER)
 				{
-					var location:Point=touch.getLocation(this);
+					location=touch.getLocation(this);
 					mouseX=location.x;
 					mouseY=location.y;
 				}
-			}
+				if (touch.phase == TouchPhase.MOVED)
+				{
+					location=touch.getLocation(this);
+					mouseX=location.x;
+					mouseY=location.y;
+				}
+			}*/
 		}
 
 		public function get mouseX():Number
