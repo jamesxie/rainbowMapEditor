@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="400">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:Image width="256" height="256" x="330" y="16"/>
+	<mx:VRule x="315" y="0" height="100%"/>
+	<s:Button x="520" y="360" label="Clear" height="30"/>
+	<s:Button x="434" y="280" label="↑" width="30" height="30"/>
+	<s:Button x="396" y="300" label="←" width="32" height="30"/>
+	<s:Button x="434" y="318" label="↓" width="30" height="30"/>
+	<s:Button x="472" y="300" label="→" width="32" height="30"/>
+</s:Group>

@@ -8,7 +8,8 @@
 					   showStatusBar="false"
 					   backgroundAlpha="0"
 					   frameRate="60"
-					   creationComplete="init()" xmlns:components="com.xskip.rainbow.editor.components.*">
+					   creationComplete="init()"
+					   xmlns:components="com.xskip.rainbow.editor.components.*">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<fx:XMLList id="myXMLListMenuBar"
@@ -51,6 +52,10 @@
 			</menuitem>
 			<menuitem id="menu3"
 					  label="窗口(W)">
+				<menuitem id="SubMenu3_0"
+						  label="当前图案"
+						  type="normal"
+						  data="SubMenu3_0"/>
 				<menuitem id="SubMenu3_1"
 						  label="全局(G)"
 						  type="check"
@@ -120,26 +125,30 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.components.ViewAsset;
 			import com.xskip.rainbow.editor.components.ViewLayer;
+			import com.xskip.rainbow.editor.components.WinImageView;
 			import com.xskip.rainbow.editor.data.GlobalData;
 			import com.xskip.rainbow.editor.event.EventCenter;
 			import com.xskip.rainbow.editor.event.JEvent;
 			import com.xskip.rainbow.editor.map.MainStarling;
 			import com.xskip.rainbow.editor.windows.WinNewProject;
 			import com.xskip.utils.HashMap;
-			
+
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
 			import mx.managers.PopUpManager;
-			
+
 			import starling.core.Starling;
 			import starling.display.Sprite;
-			
+
 			public var _CreateNewProject:WinNewProject;
-			
+
+			public var _winImageView:WinImageView;
+
 			public var _starling:Starling;
-			
-			
+
+
 			private var _commViewLayer01:ViewLayer;
 			private var _commViewLayer02:ViewLayer;
 			private var _commViewLayer03:ViewLayer;
@@ -151,163 +160,189 @@
 			private var _commViewLayer09:ViewLayer;
 			private var _commViewLayer10:ViewLayer;
 			private var _commViewLayer11:ViewLayer;
-			
+
+			private var _viewAsset:ViewAsset;
+
 			private var _hashMapViewLayer:HashMap;
-			
-			private function init():void {
-				if (stage) {
+
+			private function init():void
+			{
+				if (stage)
+				{
 					start();
-				}else {
+				}
+				else
+				{
 					addEventListener(Event.ADDED_TO_STAGE, start);
 				}
 			}
-			
-			private function start(e:Event = null):void{
-				if (hasEventListener(Event.ADDED_TO_STAGE)) {
+
+			private function start(e:Event=null):void
+			{
+				if (hasEventListener(Event.ADDED_TO_STAGE))
+				{
 					removeEventListener(Event.ADDED_TO_STAGE, start);
 				}
-				
-				stage.scaleMode = StageScaleMode.NO_SCALE;
-				stage.align = StageAlign.TOP_LEFT;
-				
+
+				stage.scaleMode=StageScaleMode.NO_SCALE;
+				stage.align=StageAlign.TOP_LEFT;
+
 				GlobalData.STAGE=stage;
-				
+
 				trace("game init");
 				_CreateNewProject=new WinNewProject();
 				_CreateNewProject.addEventListener(Event.REMOVED, onCloseHandler);
+
+				_winImageView=new WinImageView();
 			}
-			
-			private function startStarling():void{
-				
-				var fRectangle:Rectangle=new Rectangle(10,40,GlobalData.WIDTH_SCREEN_PIXEL,GlobalData.HEIGHT_SCREEN_PIXEL);
-				
+
+			private function startStarling():void
+			{
+
+				var fRectangle:Rectangle=new Rectangle(10, 40, GlobalData.WIDTH_SCREEN_PIXEL, GlobalData.HEIGHT_SCREEN_PIXEL);
+
 				//_starling.stage.bounds=fRectangle;
-				
-				_starling = new Starling(MainStarling, GlobalData.STAGE,fRectangle);
-				_starling.antiAliasing = 2;
-				_starling.enableErrorChecking = false;
-				_starling.showStats = true;
-				
+
+				_starling=new Starling(MainStarling, GlobalData.STAGE, fRectangle);
+				_starling.antiAliasing=2;
+				_starling.enableErrorChecking=false;
+				_starling.showStats=true;
+
 				GlobalData.WORLD=_starling;
-				
+
 				_starling.stage.color=0x333333;
-				
+
 				_starling.start();
-				
+
 			}
-			
-			private function onCloseHandler(e:Event):void {
-				if (e.target==_CreateNewProject){
+
+			private function onCloseHandler(e:Event):void
+			{
+				if (e.target == _CreateNewProject)
+				{
 					trace("_CreateNewProject onCloseHandler");
-					if (GlobalData.DATA_READY){
+					if (GlobalData.DATA_READY)
+					{
 						updateData();
 					}
 				}
 			}
-			
-			private function updateData():void{
-				this.input_tile_number_width.text = String(GlobalData.WIDTH_TILE_NUMBER);
-				this.input_tile_number_height.text = String(GlobalData.HEIGHT_TILE_NUMBER);
-				
-				this.input_view_width.text = String(GlobalData.WIDTH_SCREEN_PIXEL);
-				this.input_view_height.text = String(GlobalData.HEIGHT_SCREEN_PIXEL);
-				
-				this.input_tile_pixel_width.text = String(GlobalData.WIDTH_TILE_PIXEL);
-				this.input_tile_pixel_height.text = String(GlobalData.HEIGHT_TILE_PIXEL);
-				
-				
+
+			private function updateData():void
+			{
+				this.input_tile_number_width.text=String(GlobalData.WIDTH_TILE_NUMBER);
+				this.input_tile_number_height.text=String(GlobalData.HEIGHT_TILE_NUMBER);
+
+				this.input_view_width.text=String(GlobalData.WIDTH_SCREEN_PIXEL);
+				this.input_view_height.text=String(GlobalData.HEIGHT_SCREEN_PIXEL);
+
+				this.input_tile_pixel_width.text=String(GlobalData.WIDTH_TILE_PIXEL);
+				this.input_tile_pixel_height.text=String(GlobalData.HEIGHT_TILE_PIXEL);
+
+
 				//_starling.stage.width = GlobalData.WIDTH_SCREEN_PIXEL;
 				//_starling.stage.height = GlobalData.HEIGHT_SCREEN_PIXEL;
-				
-				
+
+
 				initComm();
-				
+
 				startStarling();
-				
-				trace("_starling.stage = "+_starling.stage);
-				
-				
-				
-				
+
+				trace("_starling.stage = " + _starling.stage);
+
+
+
+
 			}
-			
-			private function initComm():void {
+
+			private function initComm():void
+			{
 				_hashMapViewLayer=new HashMap();
 
-				createViewLayer(_commViewLayer01,10,"远背景",GlobalData.LAYER_BACKGROUND);
-				createViewLayer(_commViewLayer02,9,"背景卷轴1",GlobalData.LAYER_BACKGROUND_SCROLL_01);
-				createViewLayer(_commViewLayer03,8,"背景卷轴2",GlobalData.LAYER_BACKGROUND_SCROLL_02);
-				createViewLayer(_commViewLayer04,7,"地面背景",GlobalData.LAYER_FLOOR_BACKGROUND);
-				createViewLayer(_commViewLayer05,6,"地面背景修饰",GlobalData.LAYER_FLOOR_GARDEN);
-				createViewLayer(_commViewLayer06,5,"地面",GlobalData.LAYER_FLOOR);
-				createViewLayer(_commViewLayer07,4,"地面热区",GlobalData.LAYER_HOT_FLOOR);
-				createViewLayer(_commViewLayer08,3,"楼梯",GlobalData.LAYER_LADDER);
-				createViewLayer(_commViewLayer09,2,"楼梯热区",GlobalData.LAYER_HOT_LADDER);
-				createViewLayer(_commViewLayer10,1,"事件热区",GlobalData.LAYER_HOT_EVENT);
-				createViewLayer(_commViewLayer11,0,"网格层",GlobalData.LAYER_TILE_CELL);
-				
-				
-				
+
+				//添加素材
+				_viewAsset=new ViewAsset();
+				_viewAsset.height=layer_LAYER_ASSET.height;
+				layer_LAYER_ASSET.addElement(_viewAsset);
+
+
+				//添加素材管理
+				createViewLayer(_commViewLayer01, 10, "远背景", GlobalData.LAYER_BACKGROUND);
+				createViewLayer(_commViewLayer02, 9, "背景卷轴1", GlobalData.LAYER_BACKGROUND_SCROLL_01);
+				createViewLayer(_commViewLayer03, 8, "背景卷轴2", GlobalData.LAYER_BACKGROUND_SCROLL_02);
+				createViewLayer(_commViewLayer04, 7, "地面背景", GlobalData.LAYER_FLOOR_BACKGROUND);
+				createViewLayer(_commViewLayer05, 6, "地面背景修饰", GlobalData.LAYER_FLOOR_GARDEN);
+				createViewLayer(_commViewLayer06, 5, "地面", GlobalData.LAYER_FLOOR);
+				createViewLayer(_commViewLayer07, 4, "地面热区", GlobalData.LAYER_HOT_FLOOR);
+				createViewLayer(_commViewLayer08, 3, "楼梯", GlobalData.LAYER_LADDER);
+				createViewLayer(_commViewLayer09, 2, "楼梯热区", GlobalData.LAYER_HOT_LADDER);
+				createViewLayer(_commViewLayer10, 1, "事件热区", GlobalData.LAYER_HOT_EVENT);
+				createViewLayer(_commViewLayer11, 0, "网格层", GlobalData.LAYER_TILE_CELL);
+
+
+
 			}
-			
-			private function createViewLayer(pViewLayer:ViewLayer,pI:int=0,pLabel:String="",strKey:String=""):void {
+
+			private function createViewLayer(pViewLayer:ViewLayer, pI:int=0, pLabel:String="", strKey:String=""):void
+			{
 				var fFixX:int=4;
 				var fFixY:int=4;
-				
+
 				pViewLayer=new ViewLayer();
 				pViewLayer.x=fFixX;
-				pViewLayer.y=fFixY+(pViewLayer.height+fFixY)*pI;
-				pViewLayer.start(pLabel,strKey,viewLayerCallBack);
+				pViewLayer.y=fFixY + (pViewLayer.height + fFixY) * pI;
+				pViewLayer.start(pLabel, strKey, viewLayerCallBack);
 				layer_LAYER_TILE_CELL.addElement(pViewLayer);
-				
-				_hashMapViewLayer.put(strKey,pViewLayer);
-				
+
+				_hashMapViewLayer.put(strKey, pViewLayer);
+
 				//默认选中 【地面】层
-				if (strKey==GlobalData.LAYER_FLOOR){
+				if (strKey == GlobalData.LAYER_FLOOR)
+				{
 					pViewLayer.selectEdit(true);
-					layer_LAYER_TILE_CELL.label="图层"+"【"+pViewLayer.layerName.label+"】";
+					layer_LAYER_TILE_CELL.label="图层" + "【" + pViewLayer.layerName.label + "】";
 				}
 			}
-			
-			private function initViewAssetHandler():void{
-				//_ViewAsset.start(viewAssetCallBack);
-			}
-			
+
+
 			/*public function viewAssetCallBack(type:String,bitmap:Bitmap=null):void{
 				if (type==""){
-					
+
 					return;
 				}
 			}*/
-			
-			public function viewLayerCallBack(pStrKey:String="",pType:String=""):void{
-				
+
+			public function viewLayerCallBack(pStrKey:String="", pType:String=""):void
+			{
+
 				var fViewLayer:ViewLayer=ViewLayer(_hashMapViewLayer.getValue(pStrKey));
-				
+
 				/*if (pType=="show"){
 					//TODO 显示层
 					//Starling.show
 					Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(pStrKey)).visible=true;
 					return;
 				}
-				
+
 				if (pType=="hide"){
 					//TODO 显示层
 					//Starling.show
 					Sprite(GlobalData.DISPLAY_ALL_SPRITE.getValue(pStrKey)).visible=false;
 					return;
 				}*/
-				
-				
-				
-				if (pType=="edit"){
+
+
+
+				if (pType == "edit")
+				{
 					var fLength:int=_hashMapViewLayer.size();
-					
-					for (var i:int=0;i<fLength;i++){
+
+					for (var i:int=0; i < fLength; i++)
+					{
 						ViewLayer(_hashMapViewLayer.values()[i]).selectEdit(false);
 					}
 					fViewLayer.selectEdit(true);
-					layer_LAYER_TILE_CELL.label="图层"+"【"+fViewLayer.layerName.label+"】";
+					layer_LAYER_TILE_CELL.label="图层" + "【" + fViewLayer.layerName.label + "】";
 				}
 			}
 
@@ -327,6 +362,16 @@
 							return;
 						}
 						PopUpManager.addPopUp(_CreateNewProject, this, true);
+						//fCreateNewProject.visible = true;
+						break;
+					case "SubMenu3_0":
+						trace("_winImageView");
+
+						_winImageView.x=(screen.width - _winImageView.width) / 2;
+
+						_winImageView.y=(screen.height - _winImageView.height) / 2;
+
+						PopUpManager.addPopUp(_winImageView, this, false);
 						//fCreateNewProject.visible = true;
 						break;
 					case "SubMenu5_2_1":
@@ -355,8 +400,14 @@
 				itemClick="menuBar_ClickHandler(event)">
 
 	</mx:MenuBar>
-	<mx:Accordion width="200" height="100%" right="0" top="30" headerHeight="40">
-		<s:NavigatorContent label="全局参数" width="100%" height="140" maxHeight="400" >
+	<mx:Accordion width="200"
+				  height="100%"
+				  right="0"
+				  top="30"
+				  headerHeight="40">
+		<s:NavigatorContent label="全局参数"
+							width="100%"
+							height="100%">
 			<s:TextInput id="input_tile_number_width"
 						 x="90"
 						 y="10"
@@ -402,15 +453,25 @@
 			<s:Label x="12"
 					 y="75"
 					 text="单网格"/>
-			<s:Button x="90" y="100" label="更  新" width="98" height="30"/>
+			<s:Button x="90"
+					  y="100"
+					  label="更  新"
+					  width="98"
+					  height="30"/>
 		</s:NavigatorContent>
-		<s:NavigatorContent id="layer_LAYER_TILE_CELL" label="层级" width="100%" height="400" maxHeight="400">
+		<s:NavigatorContent id="layer_LAYER_TILE_CELL"
+							label="层级"
+							width="100%"
+							height="100%">
 		</s:NavigatorContent>
-		<s:NavigatorContent label="事件" width="100%" height="400" maxHeight="400">
+		<s:NavigatorContent label="事件"
+							width="100%"
+							height="100%">
 		</s:NavigatorContent>
-		<s:NavigatorContent label="素材" width="100%" height="400" maxHeight="400">
-			<components:ViewAsset id="_ViewAsset" initialize="initViewAssetHandler()">		
-			</components:ViewAsset>
+		<s:NavigatorContent id="layer_LAYER_ASSET"
+							label="素材"
+							width="100%"
+							height="100%">
 		</s:NavigatorContent>
 	</mx:Accordion>
 	<!-- 组建 end -->
