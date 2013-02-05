@@ -118,16 +118,20 @@ package com.xskip.rainbow.editor.map
 			//trace("fKey = " + fKey);
 			switch(fKey){
 				case 37:
-					_direction = 270;
+					//_direction = 270;
+					GlobalData.IMAGE_Direction=270;
 					break;
 				case 38:
-					_direction = 0;
+					//_direction = 0;
+					GlobalData.IMAGE_Direction=0;
 					break;
 				case 39:
-					_direction = 90;
+					//_direction = 90;
+					GlobalData.IMAGE_Direction=90;
 					break;
 				case 40:
-					_direction = 180;
+					//_direction = 180;
+					GlobalData.IMAGE_Direction=180;
 					break;
 				default:
 					
@@ -161,7 +165,7 @@ package com.xskip.rainbow.editor.map
 			if (_ready)
 			{
 				var fPoint:Point=getMousePlace();
-				var angle_in_radians :Number = ((_direction/180)*Math.PI); 
+				var angle_in_radians :Number = ((GlobalData.IMAGE_Direction/180)*Math.PI); 
 				
 				var fSourceBMD:BitmapData=BitmapData(e.obj);
 				var fBitmapData:BitmapData=new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL);

@@ -34,6 +34,9 @@ package com.xskip.rainbow.editor.data
 		//所有的图层
 		public static var DISPLAY_ALL_SPRITE:HashMap;
 		
+		//图片旋转角度
+		public static var IMAGE_Direction:Number;
+		
 		//---------------- 数据变量 ----------------
 		
 		public static var DATA_READY:Boolean = false;

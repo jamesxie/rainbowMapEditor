@@ -7,15 +7,44 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.data.GlobalData;
+			
 			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
 			private function init():void{
 				this.isPopUp = true;
 				addEventListener(CloseEvent.CLOSE, titleWindow_close);    
 			}
+			
 			private function titleWindow_close(e:CloseEvent):void{
 				PopUpManager.removePopUp(this);
 			}
+			
+			private function onBtnLeftHandler(event:MouseEvent):void{
+				updateDirection(-90);
+			}
+			
+			private function onBtnRightHandler(event:MouseEvent):void{
+				updateDirection(90);
+			}
+			
+			private function updateDirection(pInt:int):void{
+				
+				GlobalData.IMAGE_Direction+=pInt;
+				
+				if (GlobalData.IMAGE_Direction<0){
+					GlobalData.IMAGE_Direction=270;
+				}
+				if (GlobalData.IMAGE_Direction>270){
+					GlobalData.IMAGE_Direction=0;
+				}
+				
+				image_view.rotation = GlobalData.IMAGE_Direction;
+				
+				trace("image_view.x = "+ image_view.x);
+				trace("image_view.y = "+ image_view.y);
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -23,8 +52,8 @@
 	</fx:Declarations>
 	<s:Image id="image_view" width="128" height="128" x="10" y="10"/>
 	<s:Button id="btn_clear" x="146" y="116" label="Ｃ" height="20" width="32" toolTip="橡皮"/>
-	<s:Button id="btn_left" x="146" y="12" label="＜" width="32" height="30" toolTip="左旋转"/>
-	<s:Button id="btn_right" x="146" y="48" label="＞" width="32" height="30" toolTip="右旋转"/>
+	<s:Button id="btn_left" x="146" y="12" label="＜" width="32" height="30" toolTip="左旋转" click="onBtnLeftHandler(event)"/>
+	<s:Button id="btn_right" x="146" y="48" label="＞" width="32" height="30" toolTip="右旋转" click="onBtnRightHandler(event)"/>
 	<s:HSlider id="move_w" x="10" y="170" width="150"/>
 	<s:VSlider id="move_h" x="184" y="30" height="150"/>
 	<s:Label id="txt_direction" x="149" y="87" text="上" fontSize="12" width="27" verticalAlign="middle"/>

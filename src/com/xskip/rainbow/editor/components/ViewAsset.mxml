@@ -82,7 +82,7 @@
 					fPath = StringUtil.replace(fPath,fHomePath,"");
 					//剔除多余的'/'符号
 					fPath = fPath.slice(1,fPath.length);
-					//trace("fPath 2 = "+fPath);
+					//trace("fPath 2 = " + fPath);
 					
 					_assetPath = fPath;
 					
@@ -119,7 +119,7 @@
 				{
 					//trace(userDirFiles.length)
 					//获取images文件夹下的目录或者文件的名字
-					//trace(userDirFiles[i].name);
+					trace(userDirFiles[i].name);
 					var fTempFile:File=File(userDirFiles[i]);
 					
 					if (fTempFile.isDirectory)
@@ -140,6 +140,8 @@
 						
 						//fImage.width=myBitmap.width;
 						//fImage.height=myBitmap.height;
+						
+						trace("fImage.x = "+fImage.x+ " fImage.y = "+fImage.y);
 						
 						fileAssetView.addElement(fImage);
 					}
@@ -267,9 +269,6 @@
 			<s:layout>
 				<s:VerticalLayout/>
 			</s:layout>
-			<s:VGroup id="fileSelectedView" x="0" y="0" width="100%" height="100">
-				<s:Image id="nowSeletedImage"/>
-			</s:VGroup>
 			<s:Scroller id="scrllr"
 						focusEnabled="false"
 						hasFocusableChildren="true"
