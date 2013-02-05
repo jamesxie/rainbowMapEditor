@@ -28,6 +28,12 @@
 			private var _onDrag:Boolean;
 			private var _callBack:Function;
 			
+			private var _changeImage:Image;
+			
+			public function regImage(pImage:Image):void{
+				_changeImage = pImage;
+			}
+			
 			public function start(pFun:Function):void{
 				_callBack = pFun;
 			}
@@ -164,10 +170,14 @@
 					var bd:BitmapData = new BitmapData(fImage.width,fImage.height);
 					bd = fImage.bitmapData.clone();
 					
-					nowSeletedImage.width=bd.width;
-					nowSeletedImage.height=bd.height;
-					nowSeletedImage.source = new Bitmap(bd,'auto',true);
-					
+					//nowSeletedImage.width=bd.width;
+					//nowSeletedImage.height=bd.height;
+					//nowSeletedImage.source = new Bitmap(bd,'auto',true);
+					if (_changeImage){
+						_changeImage.width=bd.width;
+						_changeImage.height=bd.height;
+						_changeImage.source = new Bitmap(bd,'auto',true);
+					}
 					
 					stage.addEventListener(MouseEvent.MOUSE_UP,onImageUpHandler);
 					stage.addEventListener(MouseEvent.MOUSE_MOVE,onImageMoveHandler);

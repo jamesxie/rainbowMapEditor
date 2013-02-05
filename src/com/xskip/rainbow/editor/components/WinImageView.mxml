@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="400">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="200" initialize="init()" fontSize="10">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			private function init():void{
+				this.isPopUp = true;
+				addEventListener(CloseEvent.CLOSE, titleWindow_close);    
+			}
+			private function titleWindow_close(e:CloseEvent):void{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<mx:Image width="256" height="256" x="330" y="16"/>
-	<mx:VRule x="315" y="0" height="100%"/>
-	<s:Button x="520" y="360" label="Clear" height="30"/>
-	<s:Button x="434" y="280" label="↑" width="30" height="30"/>
-	<s:Button x="396" y="300" label="←" width="32" height="30"/>
-	<s:Button x="434" y="318" label="↓" width="30" height="30"/>
-	<s:Button x="472" y="300" label="→" width="32" height="30"/>
+	<s:Image id="image_view" width="128" height="128" x="10" y="10"/>
+	<s:Button id="btn_clear" x="146" y="116" label="Ｃ" height="20" width="32" toolTip="橡皮"/>
+	<s:Button id="btn_left" x="146" y="12" label="＜" width="32" height="30" toolTip="左旋转"/>
+	<s:Button id="btn_right" x="146" y="48" label="＞" width="32" height="30" toolTip="右旋转"/>
+	<s:HSlider id="move_w" x="10" y="170" width="150"/>
+	<s:VSlider id="move_h" x="184" y="30" height="150"/>
+	<s:Label id="txt_direction" x="149" y="87" text="上" fontSize="12" width="27" verticalAlign="middle"/>
 </s:Group>

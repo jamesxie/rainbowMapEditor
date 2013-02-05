@@ -134,11 +134,13 @@
 			import com.xskip.rainbow.editor.map.MainStarling;
 			import com.xskip.rainbow.editor.windows.WinNewProject;
 			import com.xskip.utils.HashMap;
-
+			
 			import mx.controls.Alert;
 			import mx.events.MenuEvent;
 			import mx.managers.PopUpManager;
-
+			
+			import spark.components.Image;
+			
 			import starling.core.Starling;
 			import starling.display.Sprite;
 
@@ -192,8 +194,6 @@
 				trace("game init");
 				_CreateNewProject=new WinNewProject();
 				_CreateNewProject.addEventListener(Event.REMOVED, onCloseHandler);
-
-				_winImageView=new WinImageView();
 			}
 
 			private function startStarling():void
@@ -259,13 +259,18 @@
 			{
 				_hashMapViewLayer=new HashMap();
 
-
+				
+				//添加素材预览层
+				_winImageView=new WinImageView();
+				_groupImage.addElement(_winImageView);
+				
+				
 				//添加素材
 				_viewAsset=new ViewAsset();
+				_viewAsset.regImage(Image(_winImageView.image_view));
 				_viewAsset.height=layer_LAYER_ASSET.height;
 				layer_LAYER_ASSET.addElement(_viewAsset);
-
-
+				
 				//添加素材管理
 				createViewLayer(_commViewLayer01, 10, "远背景", GlobalData.LAYER_BACKGROUND);
 				createViewLayer(_commViewLayer02, 9, "背景卷轴1", GlobalData.LAYER_BACKGROUND_SCROLL_01);
@@ -365,14 +370,6 @@
 						//fCreateNewProject.visible = true;
 						break;
 					case "SubMenu3_0":
-						trace("_winImageView");
-
-						_winImageView.x=(screen.width - _winImageView.width) / 2;
-
-						_winImageView.y=(screen.height - _winImageView.height) / 2;
-
-						PopUpManager.addPopUp(_winImageView, this, false);
-						//fCreateNewProject.visible = true;
 						break;
 					case "SubMenu5_2_1":
 						var fRequest5_2_1:URLRequest=new URLRequest("http://www.sina.com");
@@ -400,10 +397,21 @@
 				itemClick="menuBar_ClickHandler(event)">
 
 	</mx:MenuBar>
+	<!--图片预览区域-->
+	<s:Group id="_groupImage" width="200" height="200" right="0" top="30">
+		<s:Rect x="0" y="0" height="100%" width="100%">
+			<s:fill>
+				<s:LinearGradient rotation="250">
+					<s:GradientEntry color="#FFFFFF" ratio="0"/>
+					<s:GradientEntry color="#FFFFFF" ratio="1"/>
+				</s:LinearGradient> 
+			</s:fill>
+		</s:Rect>
+	</s:Group>
 	<mx:Accordion width="200"
 				  height="100%"
 				  right="0"
-				  top="30"
+				  top="230"
 				  headerHeight="40">
 		<s:NavigatorContent label="全局参数"
 							width="100%"
