@@ -59,7 +59,7 @@
 				<menuitem id="SubMenu3_1"
 						  label="全局(G)"
 						  type="check"
-						  toggled="false"/>
+						  toggled="true"/>
 				<menuitem id="SubMenu3_2"
 						  label="层级(L)"
 						  type="check"
@@ -267,9 +267,13 @@
 				
 				//添加素材
 				_viewAsset=new ViewAsset();
-				_viewAsset.regImage(Image(_winImageView.image_view));
-				_viewAsset.height=layer_LAYER_ASSET.height;
 				layer_LAYER_ASSET.addElement(_viewAsset);
+				
+				_viewAsset.regImage(Image(_winImageView.image_view),Image(_winImageView.image_view_shadow));
+				_viewAsset.regParent(layer_LAYER_ASSET);
+				_viewAsset.height=layer_LAYER_ASSET.height;
+				
+				trace("_viewAsset.height = "+_viewAsset.height);
 				
 				//添加素材管理
 				createViewLayer(_commViewLayer01, 10, "远背景", GlobalData.LAYER_BACKGROUND);
@@ -283,9 +287,6 @@
 				createViewLayer(_commViewLayer09, 2, "楼梯热区", GlobalData.LAYER_HOT_LADDER);
 				createViewLayer(_commViewLayer10, 1, "事件热区", GlobalData.LAYER_HOT_EVENT);
 				createViewLayer(_commViewLayer11, 0, "网格层", GlobalData.LAYER_TILE_CELL);
-
-
-
 			}
 
 			private function createViewLayer(pViewLayer:ViewLayer, pI:int=0, pLabel:String="", strKey:String=""):void
@@ -394,7 +395,7 @@
 				height="30"
 				dataProvider="{myXMLListMenuBar}"
 				labelField="@label"
-				itemClick="menuBar_ClickHandler(event)">
+				itemClick="menuBar_ClickHandler(event);">
 
 	</mx:MenuBar>
 	<!--图片预览区域-->
@@ -479,7 +480,7 @@
 		<s:NavigatorContent id="layer_LAYER_ASSET"
 							label="素材"
 							width="100%"
-							height="100%">
+							height="100%" >
 		</s:NavigatorContent>
 	</mx:Accordion>
 	<!-- 组建 end -->

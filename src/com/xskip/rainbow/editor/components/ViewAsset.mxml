@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="500" initialize="initHandler(event);">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="500" creationComplete="initHandler(event);">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import com.xskip.rainbow.editor.data.GlobalData;
 			import com.xskip.rainbow.editor.event.EventCenter;
 			import com.xskip.rainbow.editor.event.EventType;
 			import com.xskip.rainbow.editor.event.JEvent;
@@ -18,6 +19,7 @@
 			import mx.events.ListEvent;
 			
 			import spark.components.Image;
+			import spark.components.NavigatorContent;
 			import spark.skins.spark.ImageSkin;
 			
 			private var _isRun:Boolean;
@@ -29,9 +31,19 @@
 			private var _callBack:Function;
 			
 			private var _changeImage:Image;
+			private var _changeImage2:Image;
 			
-			public function regImage(pImage:Image):void{
+			private var _navigatorContent:NavigatorContent;
+			
+			public function regImage(pImage:Image,pImage2:Image):void{
+				trace(">>> regImage");
 				_changeImage = pImage;
+				_changeImage2 = pImage2;
+			}
+			
+			public function regParent(pTarget:NavigatorContent):void{
+				trace(">>> _navigatorContent");
+				_navigatorContent = pTarget;
 			}
 			
 			public function start(pFun:Function):void{
@@ -40,6 +52,7 @@
 			
 			protected function initHandler(event:FlexEvent):void
 			{
+				trace(">>> initHandler");
 				// TODO Auto-generated method stub
 				_assetPath = "";
 				
@@ -79,15 +92,29 @@
 				var fFile:File = File.applicationDirectory;
 				var fHomePath:String = fFile.nativePath;
 				if (fPath){
-					fPath = StringUtil.replace(fPath,fHomePath,"");
+					fPath = StringUtil.replace(fPath,fHomePath, "");
 					//剔除多余的'/'符号
-					fPath = fPath.slice(1,fPath.length);
+					fPath = fPath.slice(1, fPath.length);
 					//trace("fPath 2 = " + fPath);
 					
 					_assetPath = fPath;
 					
 					//选择菜单1
-					fileMenu.selectedIndex=0;
+					fileMenu.selectedIndex = 0;
+					
+					//trace("fileAssetView.height = " + fileAssetView.height);
+					
+					//修复图片无法显示的问题
+					if (fileAssetView.height == 0){
+						if (fileAssetView.stage){
+							//trace("fileAssetView.parent.height = " + fileAssetView.parent.parent.height);
+							//trace("_navigatorContent.height = " + _navigatorContent.height);
+							fileMenu.height = _navigatorContent.height;
+						}
+						//fileAssetView.height=100;
+					}
+					
+					
 					//显示各类图片
 					showImageList();
 				}
@@ -115,38 +142,64 @@
 				
 				//trace("userDirFiles.length = "+userDirFiles.length);
 				
-				for (var i:int = 0; i < userDirFiles.length; i++) 
+				//XXX
+				//for (var i:int = 0; i < userDirFiles.length; i++) 
+				
+				var fInt:int=userDirFiles.length;
+				
+				/*if (fInt>3){
+					fInt=3;
+				}*/
+				
+				for (var i:int = 0; i < fInt; i++) 
 				{
 					//trace(userDirFiles.length)
 					//获取images文件夹下的目录或者文件的名字
-					trace(userDirFiles[i].name);
+					
 					var fTempFile:File=File(userDirFiles[i]);
+					
+					//trace("file name >>> "+fTempFile.name);
 					
 					if (fTempFile.isDirectory)
 					{
-						//trace("过滤目录");
+						trace("过滤目录");
 					}else{
 						//trace(fTempFile.name);
 						var fImage:Image=new Image();
 						//trace("fTempFile.data "+fTempFile.data);
-						var myBitmap:Bitmap = new Bitmap(BitmapData(fTempFile.data));
+						
+						//var myBitmap:Bitmap = new Bitmap(BitmapData(fTempFile.data));
+						
 						//.icon.bitmaps[0] );
 						//fImage.source = "{File(userDirFiles[i]).data}";
 						fImage.source= fTempFile.nativePath;
 						
 						fImage.addEventListener(MouseEvent.MOUSE_DOWN,onImageDownHandler);
-						fImage.x = 5;
-						fImage.y = 5;
+						//fImage.x = 5;
+						//fImage.y = 5;
 						
 						//fImage.width=myBitmap.width;
 						//fImage.height=myBitmap.height;
 						
-						trace("fImage.x = "+fImage.x+ " fImage.y = "+fImage.y);
+						//trace("fImage.x = "+fImage.x+ " fImage.y = "+fImage.y);
 						
 						fileAssetView.addElement(fImage);
+						
+						/*if (_changeImage){
+							_changeImage.source = fTempFile.nativePath;
+							_changeImage2.source = fTempFile.nativePath;
+							
+							_changeImage2.width = GlobalData.WIDTH_TILE_PIXEL;
+							_changeImage2.height = GlobalData.HEIGHT_TILE_PIXEL;
+						}*/
 					}
 					
 				}
+				
+				trace("fileAssetView = " + fileAssetView);
+				trace("fileAssetView.visible = " + fileAssetView.visible);
+				
+				
 
 			}
 			
@@ -176,9 +229,20 @@
 					//nowSeletedImage.height=bd.height;
 					//nowSeletedImage.source = new Bitmap(bd,'auto',true);
 					if (_changeImage){
+						var fBitmap:Bitmap = new Bitmap(bd,'auto',true);
+						
 						_changeImage.width=bd.width;
 						_changeImage.height=bd.height;
-						_changeImage.source = new Bitmap(bd,'auto',true);
+						
+						_changeImage.source = fBitmap
+						
+						//_changeImage2.width = GlobalData.WIDTH_TILE_PIXEL;
+						//_changeImage2.height = GlobalData.HEIGHT_TILE_PIXEL;
+						
+						_changeImage2.width = bd.width;
+						_changeImage2.height = bd.height;
+						
+						_changeImage2.source = fBitmap;
 					}
 					
 					stage.addEventListener(MouseEvent.MOUSE_UP,onImageUpHandler);
