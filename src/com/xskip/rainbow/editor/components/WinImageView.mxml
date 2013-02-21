@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="200" initialize="init()" fontSize="10">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="200" height="200" initialize="init()" fontSize="10" xmlns:utils="com.xskip.utils.*">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
@@ -26,7 +26,14 @@
 			}
 			
 			private function onBtnClearHandler(event:MouseEvent):void{
+				trace("onBtnClearHandler");
+				trace("image_view_shadow.visible = " + image_view_shadow.visible);
 				
+				if (image_view_shadow.visible){
+					image_view_shadow.visible = false;
+				}else{
+					image_view_shadow.visible = true;
+				}
 			}
 			
 			private function onBtnLeftHandler(event:MouseEvent):void{
@@ -50,9 +57,7 @@
 					GlobalData.IMAGE_Direction = 0;
 				}
 				
-				//image_view.rotation = GlobalData.IMAGE_Direction;
-				
-				
+				changeDirectionTxt();
 				
 				//var offsetWidth:Number = fBitmap.width / 2;
 				//var offsetHeight:Number = fBitmap.height / 2;
@@ -60,19 +65,16 @@
 				var offsetWidth:Number = image_view.bitmapData.width / 2;
 				var offsetHeight:Number = image_view.bitmapData.height / 2;
 				
-				
-				
 				var fRadians:Number = degreesToRadians(GlobalData.IMAGE_Direction);
 				
-				trace("GlobalData.IMAGE_Direction = " + GlobalData.IMAGE_Direction);
-				trace("fRadians = " + fRadians);
+				//trace("GlobalData.IMAGE_Direction = " + GlobalData.IMAGE_Direction);
+				//trace("fRadians = " + fRadians);
 				
 				var tempMatrix:Matrix = new Matrix();
 				
 				tempMatrix.translate(-offsetWidth, -offsetHeight);
 				
 				tempMatrix.rotate(fRadians);
-				//tempMatrix.rotate(GlobalData.IMAGE_Direction);
 				
 				tempMatrix.translate(+offsetWidth, +offsetHeight);
 				
@@ -84,29 +86,32 @@
 				
 				var fBitmap:Bitmap = new Bitmap(fBitmapData);
 				
-				//2013-02-18 TODO 继续工作
-				//fBitmap.bitmapData.dispose();
 				
-				
-				//fBitmap.bitmapData.draw(image_view.bitmapData.clone(),tempMatrix);
-				
-				
-				//fBitmap.transform.matrix=tempMatrix;
-				
-				trace("offsetWidth = " + offsetWidth + " offsetHeight = " + offsetHeight);
-				
-				
-				
+				//trace("offsetWidth = " + offsetWidth + " offsetHeight = " + offsetHeight);
 				
 				image_view_shadow.source = fBitmap;
 				
-				//image_view_shadow.source = fBitmap;
+				//设置照片角度
+				image_view_shadow.direction = GlobalData.IMAGE_Direction;
 				
-				//image_view_shadow.transform.matrix=tempMatrix;
+				//TODO 设置图片宽高
 				
-				//trace("image_view.x = " + image_view.x);
-				//trace("image_view.y = " + image_view.y);
-				
+			}
+			
+			//改变方向文本
+			private function changeDirectionTxt():void{
+				if (GlobalData.IMAGE_Direction==0){
+					txt_direction.text = "↑";
+				}
+				if (GlobalData.IMAGE_Direction==90){
+					txt_direction.text = "→";
+				}
+				if (GlobalData.IMAGE_Direction==180){
+					txt_direction.text = "↓";
+				}
+				if (GlobalData.IMAGE_Direction==270){
+					txt_direction.text = "←";
+				}
 			}
 			
 			//旋转
@@ -120,11 +125,11 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<s:Image id="image_view" x="10" y="10" width="128" height="128" visible="false"/>
-	<s:Image id="image_view_shadow" x="10" y="10" width="128" height="128"/>
-	<s:Button id="btn_clear" x="146" y="116" label="Ｃ" width="32" height="20" toolTip="橡皮" click="onBtnClearHandler(event)"/>
-	<s:Button id="btn_left" x="146" y="12" label="＜" width="32" height="30" toolTip="左旋转" click="onBtnLeftHandler(event)"/>
-	<s:Button id="btn_right" x="146" y="48" label="＞" width="32" height="30" toolTip="右旋转" click="onBtnRightHandler(event)"/>
+	<utils:ImageSparkPlus id="image_view_shadow" x="10" y="10" width="128" height="128" visible="false"/>
+	<s:Button id="btn_clear" x="146" y="116" label="Ｃ" width="32" height="20" toolTip="橡皮" click="onBtnClearHandler(event);"/>
+	<s:Button id="btn_left" x="146" y="12" label="＜" width="32" height="30" toolTip="左旋转" click="onBtnLeftHandler(event);"/>
+	<s:Button id="btn_right" x="146" y="48" label="＞" width="32" height="30" toolTip="右旋转" click="onBtnRightHandler(event);"/>
 	<s:HSlider id="move_w" x="10" y="170" width="150"/>
 	<s:VSlider id="move_h" x="184" y="30" height="150"/>
-	<s:Label id="txt_direction" x="149" y="87" text="上" fontSize="12" width="27" verticalAlign="middle"/>
+	<s:Label id="txt_direction" x="149" y="87" text="↑" fontSize="12" width="27" verticalAlign="middle"/>
 </s:Group>

@@ -11,6 +11,7 @@
 			import com.xskip.rainbow.editor.event.EventCenter;
 			import com.xskip.rainbow.editor.event.EventType;
 			import com.xskip.rainbow.editor.event.JEvent;
+			import com.xskip.utils.ImageSparkPlus;
 			import com.xskip.utils.StringUtil;
 			
 			import mx.core.Application;
@@ -31,22 +32,22 @@
 			private var _callBack:Function;
 			
 			private var _changeImage:Image;
-			private var _changeImage2:Image;
+			private var _changeImage2:ImageSparkPlus;
 			
 			private var _navigatorContent:NavigatorContent;
 			
-			public function regImage(pImage:Image,pImage2:Image):void{
+			public function regImage(pImage:Image,pImage2:ImageSparkPlus):void {
 				trace(">>> regImage");
 				_changeImage = pImage;
 				_changeImage2 = pImage2;
 			}
 			
-			public function regParent(pTarget:NavigatorContent):void{
+			public function regParent(pTarget:NavigatorContent):void {
 				trace(">>> _navigatorContent");
 				_navigatorContent = pTarget;
 			}
 			
-			public function start(pFun:Function):void{
+			public function start(pFun:Function):void {
 				_callBack = pFun;
 			}
 			
@@ -172,7 +173,7 @@
 						
 						//.icon.bitmaps[0] );
 						//fImage.source = "{File(userDirFiles[i]).data}";
-						fImage.source= fTempFile.nativePath;
+						fImage.source = fTempFile.nativePath;
 						
 						fImage.addEventListener(MouseEvent.MOUSE_DOWN,onImageDownHandler);
 						//fImage.x = 5;
@@ -196,22 +197,66 @@
 					
 				}
 				
-				trace("fileAssetView = " + fileAssetView);
+				//trace("fileAssetView = " + fileAssetView);
 				trace("fileAssetView.visible = " + fileAssetView.visible);
 				
-				
-
 			}
 			
 			private function onImageDownHandler(e:MouseEvent):void{
 				
-				_imageDragFixX = e.localX;
-				_imageDragFixY = e.localY;
+				//方法一 选择图片
+				selectImage(Image(e.currentTarget),e.localX,e.localY);
+				
+				//XXX 方法二 拖拽图片 已经不再使用
+				//dragImage(Image(e.currentTarget),e.localX,e.localY);
+				
+			}
+			
+			
+			private function selectImage(pImage:Image,x:Number,y:Number):void{
+				//trace("selectImage");
+				
+				_imageDragFixX = x;
+				_imageDragFixY = y;
+				
+				if (pImage){
+					var fImage:Image=pImage;
+					
+					FlexGlobals.topLevelApplication.addElement(_imageDrag);
+					
+					var bd:BitmapData = new BitmapData(fImage.width,fImage.height);
+					bd = fImage.bitmapData.clone();
+					
+					if (_changeImage){
+						var fBitmap:Bitmap = new Bitmap(bd,'auto',true);
+						
+						_changeImage.width = bd.width;
+						_changeImage.height = bd.height;
+						_changeImage.source = fBitmap;
+						
+						_changeImage2.width = bd.width;
+						_changeImage2.height = bd.height;
+						_changeImage2.source = fBitmap;
+						
+						//(如果隐藏)强制显示
+						_changeImage2.visible = true;
+					}
+					
+				}else{
+					return;
+				}
+			}
+			
+			private function dragImage(pImage:Image,x:Number,y:Number):void{
+				trace("dragImage");
+				
+				_imageDragFixX = x;
+				_imageDragFixY = y;
 				
 				//trace("e.target = "+e.currentTarget);
 				
-				if (e.currentTarget as Image){
-					var fImage:Image=Image(e.currentTarget);
+				if (pImage){
+					var fImage:Image=pImage;
 					
 					_imageDrag.source = fImage.source;
 					_imageDrag.width = fImage.width;
@@ -231,10 +276,10 @@
 					if (_changeImage){
 						var fBitmap:Bitmap = new Bitmap(bd,'auto',true);
 						
-						_changeImage.width=bd.width;
-						_changeImage.height=bd.height;
+						_changeImage.width = bd.width;
+						_changeImage.height = bd.height;
 						
-						_changeImage.source = fBitmap
+						_changeImage.source = fBitmap;
 						
 						//_changeImage2.width = GlobalData.WIDTH_TILE_PIXEL;
 						//_changeImage2.height = GlobalData.HEIGHT_TILE_PIXEL;
@@ -251,7 +296,6 @@
 				}else{
 					return;
 				}
-				
 			}
 			
 			private function onImageMoveHandler(e:MouseEvent):void{

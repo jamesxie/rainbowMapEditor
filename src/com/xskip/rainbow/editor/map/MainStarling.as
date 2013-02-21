@@ -1,10 +1,12 @@
 package com.xskip.rainbow.editor.map
 {
 	import com.xskip.rainbow.editor.data.GlobalData;
+	import com.xskip.rainbow.editor.data.TileValues;
 	import com.xskip.rainbow.editor.event.EventCenter;
 	import com.xskip.rainbow.editor.event.EventType;
 	import com.xskip.rainbow.editor.event.JEvent;
 	import com.xskip.utils.HashMap;
+	import com.xskip.utils.ImageSparkPlus;
 	import com.xskip.utils.StarlingLine;
 	
 	import flash.display.BitmapData;
@@ -22,6 +24,7 @@ package com.xskip.rainbow.editor.map
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
 	import starling.textures.Texture;
+	
 
 	public class MainStarling extends Sprite
 	{
@@ -46,13 +49,22 @@ package com.xskip.rainbow.editor.map
 		private var _direction:Number;
 		//缩放比例
 		private var _zoom:Number;
-		
-		
-
-
 
 		//地面贴图合集
 		private var _hmLAYER_FLOOR:HashMap;
+		
+		//笔刷目标（只绑定一次）
+		private var _ImageSparkPlus:ImageSparkPlus;
+		
+		//鼠标是否按下
+		private var _isMouseDown:Boolean;
+		//笔触历史位置
+		private var _pointHistory:Point;
+		
+		//已经保存的地图数据
+		//key : 层name_x_y 
+		//values : TileValues CLASS [width,height,path,filename,x,y,Image]
+		private var _hmTiles:HashMap;
 
 		public function MainStarling()
 		{
@@ -64,13 +76,28 @@ package com.xskip.rainbow.editor.map
 
 		private function init():void
 		{
-			_ready=false;
+			_ready = false;
 
 			initData();
 			initDisplay();
 			initEventListener();
 
-			_ready=true;
+			_ready = true;
+			
+			_isMouseDown = false;
+			
+			_pointHistory=new Point();
+			
+			_hmTiles=new HashMap();
+			
+			GlobalData.SAVE_DATA = _hmTiles;
+			
+			resetPointHistory();
+		}
+		
+		private function resetPointHistory():void{
+			_pointHistory.x = -1;
+			_pointHistory.y = -1;
 		}
 
 		private function initData():void
@@ -103,14 +130,73 @@ package com.xskip.rainbow.editor.map
 
 		private function initEventListener():void
 		{
-			//更新坐标位置
-			//GlobalData.WORLD.stage.addEventListener(TouchEvent.TOUCH, onTouchHandler);
+			//笔触广播
+			GlobalData.WORLD.stage.addEventListener(TouchEvent.TOUCH, onTouchHandler);
 			
 			GlobalData.STAGE.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMoveHandler);
+			
+			//XXX 即将取消的功能
 			GlobalData.STAGE.addEventListener(KeyboardEvent.KEY_UP,onKeyboardUpHandler);
 			
+			//XXX 已经被取消的功能
 			EventCenter.dispatcher.addEventListener(EventType.EVENT_CHANGE_IMAGE, onChangeImageHandler);
+			
+			//更新笔刷图片
+			//EventCenter.dispatcher.addEventListener(EventType.EVENT_BRUSH_IMAGE, onBrushImageHandler);
+			
 		}
+		
+		//设置笔刷
+		public function setBrushImage(pImageSparkPlus:ImageSparkPlus):void{
+			_ImageSparkPlus = pImageSparkPlus;
+		}
+		
+		//更新笔刷图片
+		private function onBrushImageHandler(e:JEvent):void{
+			if (_ready){
+				
+				var fImageSparkPlus:ImageSparkPlus = ImageSparkPlus(e.obj);
+				
+				if (!fImageSparkPlus.visible){
+					trace("隐藏");
+				}else{
+					trace("显示");
+				}
+				
+				/*
+				//取得位置
+				var fPoint:Point = getMousePlace();
+				
+				var angle_in_radians :Number = ((GlobalData.IMAGE_Direction/180)*Math.PI); 
+				
+				var fSourceBMD:BitmapData=BitmapData(e.obj);
+				var fBitmapData:BitmapData=new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL);
+				
+				_matrix=new Matrix();
+				_matrix.tx-=(fSourceBMD.width/2);
+				_matrix.ty-=(fSourceBMD.height/2);
+				
+				_matrix.rotate(angle_in_radians);
+				
+				_matrix.tx+=(fSourceBMD.width/2);
+				_matrix.ty+=(fSourceBMD.height/2);
+				_matrix.scale(_zoom,_zoom);
+				
+				fBitmapData.draw(fSourceBMD,_matrix);
+				
+				var fTexture:Texture=Texture.fromBitmapData(fBitmapData);
+				
+				var fImage:Image=new Image(fTexture);
+				fImage.x=fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
+				fImage.y=fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
+				
+				//trace("fImage.x "+fImage.x+" fImage.y "+fImage.y);
+				
+				_spNow.addChild(fImage);
+				*/
+			}
+		}
+		
 		
 		//键盘设置缩放和旋转
 		private function onKeyboardUpHandler(e:KeyboardEvent):void{
@@ -159,7 +245,7 @@ package com.xskip.rainbow.editor.map
 			
 		}
 		
-
+		//XXX 暂时无用的方法
 		private function onChangeImageHandler(e:JEvent):void
 		{
 			if (_ready)
@@ -268,10 +354,10 @@ package com.xskip.rainbow.editor.map
 
 		private function addSprite(pKey:String=""):void
 		{
-			var fSprite:Sprite=new Sprite();
+			var fSprite:Sprite = new Sprite();
 
 			//禁止点击
-			fSprite.touchable=false;
+			fSprite.touchable = false;
 
 			GlobalData.DISPLAY_ALL_SPRITE.put(pKey, fSprite);
 			GlobalData.WORLD.stage.addChild(fSprite);
@@ -319,18 +405,125 @@ package com.xskip.rainbow.editor.map
 			
 			var touch:Touch = e.getTouch(GlobalData.WORLD.stage);
 			if (touch){
-				trace("touch.phase = " + touch.phase);
 				
+				//trace("touch.phase = " + touch.phase);
+				
+				if (touch.phase == TouchPhase.BEGAN){
+					//trace("开始绘制");
+					_isMouseDown=true;
+					resetPointHistory();
+				}
+				
+				if (touch.phase == TouchPhase.ENDED){
+					//trace("结束绘制");
+					_isMouseDown=false;
+					resetPointHistory();
+				}
+				
+				//移动
 				if (touch.phase == TouchPhase.MOVED){
-					mouseX = touch.globalX;
-					mouseY = touch.globalY;
-					//trace("mouseX "+mouseX+" mouseY "+mouseY);
+					
+					//trace("_isMouseDown = " + _isMouseDown);
+					//trace("_ready = " + _ready);
+					
+					if (_isMouseDown && _ready){
+						
+						if (GlobalData.IMAGE_SPARK_PLUS){
+							
+							//获取位置参数
+							
+							var fPoint:Point = getMousePlace();
+							
+							
+							if (fPoint.x == _pointHistory.x && fPoint.y == _pointHistory.y){
+								return;
+							}else{
+								_pointHistory.x = fPoint.x;
+								_pointHistory.y = fPoint.y;
+							}
+							
+							
+							
+							
+							var fkey:String = GlobalData.SELECTED_LAYER+"_"+String(fPoint.x)+"_"+String(fPoint.y);
+							
+							//trace("------------------------------");
+							//trace("处理 fkey = "+fkey);
+							
+							var fValues:TileValues;
+							
+							if (_hmTiles.containsKey(fkey)){
+								fValues=TileValues(_hmTiles.getValue(fkey));
+							}else{
+								fValues = new TileValues();
+							}
+							
+							
+							if (GlobalData.IMAGE_SPARK_PLUS.visible){
+								///////显示中
+								
+								//trace("绘制");
+								
+								
+								var fSourceBMD:BitmapData = BitmapData(GlobalData.IMAGE_SPARK_PLUS.bitmapData);
+								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL);
+								
+								fBitmapData.draw(fSourceBMD,_matrix);
+								
+								var fTexture:Texture = Texture.fromBitmapData(fBitmapData);
+								
+								if (fValues.image){
+									fValues.image.texture.dispose();
+									fValues.image.texture = fTexture;
+								}else{
+									fValues.image = new Image(fTexture);
+								}
+								
+								if (!_spNow.contains(fValues.image)){
+									_spNow.addChild(fValues.image);
+								}
+								
+								//var fImage:Image = new Image(fTexture);
+								
+								fValues.image.x = fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
+								fValues.image.y = fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
+								
+								//fValues.image=fImage;
+								
+								_hmTiles.put(fkey,fValues);
+								
+								
+							}else{
+								///////删除中
+								
+								//trace("删除 fkey = "+fkey);
+								
+								if (_hmTiles.containsKey(fkey)){
+									
+									//trace("得到删除项目");
+									fValues=TileValues(_hmTiles.getValue(fkey));
+									
+									var fImage2:Image=fValues.image;
+									
+									//trace("fImage2 = "+fImage2);
+									
+									//trace("_spNow.contains(fImage2) = "+_spNow.contains(fImage2));
+									
+									_spNow.removeChild(fImage2);
+									
+									_hmTiles.remove(fkey);
+									
+								}
+								
+								
+								
+							}
+						}
+
+						
+					}
 				}
-				if (touch.phase == TouchPhase.HOVER){
-					mouseX = touch.globalX;
-					mouseY = touch.globalY;
-					//trace("mouseX "+mouseX+" mouseY "+mouseY);
-				}
+				
 			}
 		}
 

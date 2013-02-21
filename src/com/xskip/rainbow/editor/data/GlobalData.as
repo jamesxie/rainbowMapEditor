@@ -1,6 +1,7 @@
 package com.xskip.rainbow.editor.data
 {
 	import com.xskip.utils.HashMap;
+	import com.xskip.utils.ImageSparkPlus;
 	
 	import flash.display.Stage;
 	
@@ -37,12 +38,20 @@ package com.xskip.rainbow.editor.data
 		//图片旋转角度
 		public static var IMAGE_Direction:Number = 0;
 		
+		//笔刷（内容有或无）
+		public static var IMAGE_SPARK_PLUS:ImageSparkPlus;
+		
 		//---------------- 数据变量 ----------------
 		
 		public static var DATA_READY:Boolean = false;
 		
 		//当前选中层
 		public static var SELECTED_LAYER:String="";
+		
+		//需要保存的数据
+		//key : 层name_x_y 
+		//values : TileValues CLASS [width,height,path,filename,x,y,Image]
+		public static var SAVE_DATA:HashMap;
 		
 		//---------------- 层级常量 ----------------
 		//1 远背景
