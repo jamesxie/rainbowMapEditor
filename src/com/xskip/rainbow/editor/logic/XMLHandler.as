@@ -50,13 +50,32 @@ package com.xskip.rainbow.editor.logic
 				var fKey:String = fHM_DATA.keys()[i];
 				var fTileValues:TileValues=TileValues(fHM_DATA.getValue(fKey));
 
-				fContents+="\t<config key='"+fKey+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
+				fContents+="\t<config layer='"+fTileValues.layer+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
 					"width='"+fTileValues.width+"' " +
 					"height='"+fTileValues.height+"' " +
 					"path='"+fTileValues.path+"' " +
 					"filename='"+fTileValues.filename+"' " +
 					"/>\n";
 			}
+			
+			
+			fContents+="\t<config layer='onSort'/>\n";
+			
+			fHM_DATA.sortByKey();
+			
+			for (var j:int = 0;j < fLength;j++){
+				var fKey2:String = fHM_DATA.keys()[j];
+				var fTileValues2:TileValues=TileValues(fHM_DATA.getValue(fKey2));
+				
+				fContents+="\t<config layer='"+fTileValues2.layer+"' x='"+fTileValues2.x+"' y='"+fTileValues2.y+"' " +
+					"width='"+fTileValues2.width+"' " +
+					"height='"+fTileValues2.height+"' " +
+					"path='"+fTileValues2.path+"' " +
+					"filename='"+fTileValues2.filename+"' " +
+					"/>\n";
+			}
+			
+			
 			
 			//fContents+="\t<config id='1' type='A' values='东汉末年，宦官专权，群雄逐鹿中原。' time='12' next='2'/>\n";
 			//fContents+="\t<config id='2' type='A' values='时巨鹿郡有兄弟三人，一名张角，一名张宝，一名张梁。' time='12' next='3'/>\n";

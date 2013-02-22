@@ -7,6 +7,8 @@
 */
 
 package com.xskip.utils {
+	import com.xskip.rainbow.editor.data.TileValues;
+	
 	import flash.utils.Dictionary;
 
 	/**
@@ -246,7 +248,61 @@ public class HashMap
    			temp += ks[i]+" -> "+vs[i] + "\n";
   		}
   		return temp;
- 	}		
+ 	}
+	
+	//排序
+	public function sortByKey():void{
+		if (!this){
+			return;
+		}
+		
+		
+		var fHmTemp:HashMap=this.clone();
+		var fArrKey:Array=this.keys();
+		//排序后
+		var fArrKeySort:Array=new Array();
+		
+		trace("排序前"+this.toString());
+		
+		trace("key -------------");
+		for (var j:int=0;j<fArrKey.length;j++){
+			var fKey:*=fArrKey[j];
+			var fTileValues:TileValues=TileValues(fHmTemp.getValue(fKey));
+			trace("key = "+fTileValues.key);
+			fArrKeySort.push({layer:fTileValues.layer,x:fTileValues.x,y:fTileValues.y,key:fKey});
+		}
+		
+		//fArrKey.sort();
+		
+		fArrKeySort.sortOn("key", Array.DESCENDING | Array.NUMERIC);
+		//fArrKeySort.sort(compare);
+
+		
+		this.clear();
+		
+		for (var i:int=0;i<fArrKeySort.length;i++){
+			
+			var fKey1:Object=fArrKeySort[i];
+			trace(">> fKey1.key = "+fKey1.key);
+			this.put(fKey1.key,fHmTemp.getValue(fKey1.key));
+		}
+		
+		
+		trace("排序后"+this.toString());
+	}
+	
+	
+	private function compare(paramA:Object,paramB:Object):int
+	{
+		if(paramA["layer"] < paramB["layer"]) return -1;
+		if(paramA["layer"] > paramB["layer"]) return 1;
+		if(paramA['x'] < paramB['x']) return -1;
+		if(paramA['x'] > paramB['x']) return 1;
+		if(paramA['y'] < paramB['y']) return -1;
+		if(paramA['y'] > paramB['y']) return 1;
+		return 0;
+	}
+
 }
 
 }

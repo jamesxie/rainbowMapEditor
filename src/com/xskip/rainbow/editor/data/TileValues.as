@@ -5,6 +5,8 @@ package com.xskip.rainbow.editor.data
 	public class TileValues
 	{
 		
+		private var _layer:String;
+		
 		private var _x:Number;
 		private var _y:Number;
 		
@@ -23,12 +25,44 @@ package com.xskip.rainbow.editor.data
 		}
 		
 		private function init():void{
+			_layer="";
 			_x=0;
 			_y=0;
 			_width=0;
 			_height=0;
 			_path="";
 			_filename="";
+		}
+		
+		
+		public function set key(str:String):void{
+			var fStr:String=str;
+			var fArr:Array=fStr.split("-");
+			
+			trace("fStr = "+fStr +" fArr.length = "+fArr.length);
+			if (fArr.length == 4){
+				layer=String(fArr[1]);
+				x=Number(fArr[2]);
+				y=Number(fArr[3]);
+				//第四位不用显示 IMAGE
+			}
+		}
+		
+		public function get key():String{
+			if (layer.length==0){
+				layer="Layer$Fail";
+			}
+			
+			return layer+"_"+String(x)+"_"+String(y);
+		}
+		
+		
+		public function set layer(str:String):void{
+			_layer = str;
+		}
+		
+		public function get layer():String{
+			return _layer;
 		}
 		
 		

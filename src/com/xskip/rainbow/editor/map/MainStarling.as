@@ -445,7 +445,7 @@ package com.xskip.rainbow.editor.map
 							
 							
 							
-							var fkey:String = GlobalData.SELECTED_LAYER+"_"+String(fPoint.x)+"_"+String(fPoint.y);
+							var fkey:String = GlobalData.SELECTED_LAYER+"-"+String(fPoint.x)+"-"+String(fPoint.y);
 							
 							//trace("------------------------------");
 							//trace("处理 fkey = "+fkey);
@@ -456,6 +456,7 @@ package com.xskip.rainbow.editor.map
 								fValues=TileValues(_hmTiles.getValue(fkey));
 							}else{
 								fValues = new TileValues();
+								fValues.key = fkey;
 							}
 							
 							
