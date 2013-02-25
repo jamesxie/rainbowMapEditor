@@ -4,6 +4,7 @@ package com.xskip.rainbow.editor.logic
 	import com.xskip.rainbow.editor.data.TileValues;
 	import com.xskip.utils.HashMap;
 	
+	import flash.events.Event;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
@@ -59,9 +60,11 @@ package com.xskip.rainbow.editor.logic
 			}
 			
 			
+			/*
 			fContents+="\t<config layer='onSort'/>\n";
 			
-			fHM_DATA.sortByKey();
+			//TODO 2013-02-25 暂时不用 排序算法
+			//fHM_DATA.sortByKey();
 			
 			for (var j:int = 0;j < fLength;j++){
 				var fKey2:String = fHM_DATA.keys()[j];
@@ -73,7 +76,7 @@ package com.xskip.rainbow.editor.logic
 					"path='"+fTileValues2.path+"' " +
 					"filename='"+fTileValues2.filename+"' " +
 					"/>\n";
-			}
+			}*/
 			
 			
 			
@@ -89,15 +92,28 @@ package com.xskip.rainbow.editor.logic
 			var stream:FileStream = new FileStream();
 			
 			stream.open(file, FileMode.WRITE);
-			
 			stream.writeUTFBytes(fContents);
 			
-			stream.close();
+			stream.openAsync(file, FileMode.READ); 
+			stream.addEventListener(Event.COMPLETE, saveCompleteHandler);
 			
-			Alert.show("保存完毕!!!\n\n位置 : "+file.nativePath+"\n\n","提示");
+			//Alert.show("保存完毕!!!\n\n位置 : "+file.nativePath+"\n\n","提示");
 			
+			//stream.close();
+
 			// msgTxt.text = "数据保存路径：" + file.nativePath;
 			
-		}     
+		}
+		
+		private function saveCompleteHandler(e:Event):void{
+			var fStream:FileStream=FileStream(e.target);
+			if (fStream.hasEventListener(Event.COMPLETE)){
+				fStream.removeEventListener(Event.COMPLETE, saveCompleteHandler);
+			}
+			
+			fStream.close();
+			
+			Alert.show("保存完毕!!!\n\n","提示");
+		}
 	}
 }

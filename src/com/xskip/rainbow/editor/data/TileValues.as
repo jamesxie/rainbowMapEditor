@@ -39,7 +39,7 @@ package com.xskip.rainbow.editor.data
 			var fStr:String=str;
 			var fArr:Array=fStr.split("-");
 			
-			trace("fStr = "+fStr +" fArr.length = "+fArr.length);
+			//trace("fStr = "+fStr +" fArr.length = "+fArr.length);
 			if (fArr.length == 4){
 				layer=String(fArr[1]);
 				x=Number(fArr[2]);

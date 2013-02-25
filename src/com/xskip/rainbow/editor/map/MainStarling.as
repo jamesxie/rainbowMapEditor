@@ -468,7 +468,7 @@ package com.xskip.rainbow.editor.map
 								
 								
 								var fSourceBMD:BitmapData = BitmapData(GlobalData.IMAGE_SPARK_PLUS.bitmapData);
-								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL);
+								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL,true);
 								
 								fBitmapData.draw(fSourceBMD,_matrix);
 								
@@ -489,6 +489,9 @@ package com.xskip.rainbow.editor.map
 								
 								fValues.image.x = fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
 								fValues.image.y = fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
+								
+								//随即加一个文件名
+								fValues.filename=String(Math.floor(Math.random()*300+20));
 								
 								//fValues.image=fImage;
 								

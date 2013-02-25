@@ -373,7 +373,7 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<mx:TabNavigator id="fileMenu" x="0" y="0" width="200" height="100%">
-		<s:NavigatorContent label="素材编辑" width="200" height="100%">
+		<s:NavigatorContent label="素材编辑" width="200" height="100%" backgroundColor="0xFFFFFF">
 			<s:layout>
 				<s:VerticalLayout/>
 			</s:layout>
@@ -382,9 +382,19 @@
 						hasFocusableChildren="true"
 						width="200" height="100%"
 						horizontalCenter="0" verticalCenter="0" top="180">
+				
+
+				
 				<s:VGroup id="fileAssetView" top="0" x="0" y="0" width="100%" height="100%">
 				</s:VGroup>
+				
+				
+				
+				
 			</s:Scroller>
+
+			
+			
 		</s:NavigatorContent>
 		<s:NavigatorContent label="目录" width="200" height="100%">
 			<mx:FileSystemTree  id="fileSystemTree" filterFunction="filterFunctionHandler" addedToStage="addtoStageHandler(event)" horizontalScrollPolicy="on" verticalScrollPolicy="auto" width="100%" height="300" change="onChangeHandler(event)"/> 
