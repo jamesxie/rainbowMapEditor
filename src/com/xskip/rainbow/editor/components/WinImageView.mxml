@@ -18,7 +18,7 @@
 			
 			private function init():void{
 				this.isPopUp = true;
-				addEventListener(CloseEvent.CLOSE, titleWindow_close);    
+				addEventListener(CloseEvent.CLOSE, titleWindow_close);
 			}
 			
 			private function titleWindow_close(e:CloseEvent):void{

@@ -271,6 +271,7 @@ package com.xskip.rainbow.editor.map
 				var fTexture:Texture=Texture.fromBitmapData(fBitmapData);
 
 				var fImage:Image=new Image(fTexture);
+				
 				fImage.x=fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
 				fImage.y=fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
 				
