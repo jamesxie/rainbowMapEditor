@@ -374,8 +374,8 @@ package com.xskip.rainbow.editor.map
 			fSprite.alpha=0.5;
 
 			//TODO 以后变更为真正场景宽高
-			var fWNum:int=int(GlobalData.WIDTH_SCREEN_PIXEL / GlobalData.WIDTH_TILE_PIXEL) + 1;
-			var fHNum:int=int(GlobalData.HEIGHT_SCREEN_PIXEL / GlobalData.HEIGHT_TILE_PIXEL) + 1;
+			var fWNum:int = int(GlobalData.WIDTH_SCREEN_PIXEL / GlobalData.WIDTH_TILE_PIXEL) + 1;
+			var fHNum:int = int(GlobalData.HEIGHT_SCREEN_PIXEL / GlobalData.HEIGHT_TILE_PIXEL) + 1;
 
 			//trace("fWNum = "+fWNum);
 			//trace("fHNum = "+fHNum);
@@ -494,11 +494,13 @@ package com.xskip.rainbow.editor.map
 								//文件名
 								fValues.filename = GlobalData.IMAGE_SPARK_PLUS.fileName;
 								
-								fValues.width = GlobalData.IMAGE_SPARK_PLUS.baseWidth;
-								fValues.height = GlobalData.IMAGE_SPARK_PLUS.baseHeight;
+								fValues.width = fValues.image.width;
+								fValues.height = fValues.image.height;
 								
 								fValues.layer = GlobalData.SELECTED_LAYER;
 								
+								fValues.x = fPoint.x;
+								fValues.y = fPoint.y;
 								
 								//fValues.image=fImage;
 								
