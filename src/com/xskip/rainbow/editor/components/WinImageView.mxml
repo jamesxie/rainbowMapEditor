@@ -26,8 +26,8 @@
 			}
 			
 			private function onBtnClearHandler(event:MouseEvent):void{
-				trace("onBtnClearHandler");
-				trace("image_view_shadow.visible = " + image_view_shadow.visible);
+				//trace("onBtnClearHandler");
+				//trace("image_view_shadow.visible = " + image_view_shadow.visible);
 				
 				if (image_view_shadow.visible){
 					image_view_shadow.visible = false;
@@ -80,12 +80,11 @@
 				
 				
 				
-				var fBitmapData:BitmapData=new BitmapData(image_view.bitmapData.width,image_view.bitmapData.height);
+				var fBitmapData:BitmapData=new BitmapData(image_view.bitmapData.width,image_view.bitmapData.height,true,0x00000000);
 				
 				fBitmapData.draw(image_view.bitmapData.clone(),tempMatrix);
 				
 				var fBitmap:Bitmap = new Bitmap(fBitmapData);
-				
 				
 				//trace("offsetWidth = " + offsetWidth + " offsetHeight = " + offsetHeight);
 				
@@ -124,7 +123,7 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:BorderContainer x="0" y="0" width="200" height="200" backgroundColor="0xFFFFFF">
+	<s:BorderContainer x="0" y="0" width="200" height="200" backgroundColor="0x006600">
 		<s:Image id="image_view" x="10" y="10" width="128" height="128" visible="false"/>
 		<utils:ImageSparkPlus id="image_view_shadow" x="10" y="10" width="128" height="128" visible="false"/>
 		<s:Button id="btn_clear" x="146" y="116" label="Ｃ" width="32" height="20" toolTip="橡皮" click="onBtnClearHandler(event);"/>

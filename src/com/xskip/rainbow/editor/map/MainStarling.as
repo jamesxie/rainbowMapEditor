@@ -139,7 +139,7 @@ package com.xskip.rainbow.editor.map
 			GlobalData.STAGE.addEventListener(KeyboardEvent.KEY_UP,onKeyboardUpHandler);
 			
 			//XXX 已经被取消的功能
-			EventCenter.dispatcher.addEventListener(EventType.EVENT_CHANGE_IMAGE, onChangeImageHandler);
+			//EventCenter.dispatcher.addEventListener(EventType.EVENT_CHANGE_IMAGE, onChangeImageHandler);
 			
 			//更新笔刷图片
 			//EventCenter.dispatcher.addEventListener(EventType.EVENT_BRUSH_IMAGE, onBrushImageHandler);
@@ -245,6 +245,7 @@ package com.xskip.rainbow.editor.map
 			
 		}
 		
+		/*
 		//XXX 暂时无用的方法
 		private function onChangeImageHandler(e:JEvent):void
 		{
@@ -269,7 +270,7 @@ package com.xskip.rainbow.editor.map
 				fBitmapData.draw(fSourceBMD,_matrix);
 				
 				var fTexture:Texture=Texture.fromBitmapData(fBitmapData);
-
+				
 				var fImage:Image=new Image(fTexture);
 				
 				fImage.x=fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
@@ -280,7 +281,8 @@ package com.xskip.rainbow.editor.map
 				_spNow.addChild(fImage);
 			}
 		}
-
+		*/
+		
 		//得到鼠标（所在网格）位置
 		private function getMousePlace():Point
 		{
@@ -443,9 +445,6 @@ package com.xskip.rainbow.editor.map
 								_pointHistory.y = fPoint.y;
 							}
 							
-							
-							
-							
 							var fkey:String = GlobalData.SELECTED_LAYER+"-"+String(fPoint.x)+"-"+String(fPoint.y);
 							
 							//trace("------------------------------");
@@ -468,7 +467,7 @@ package com.xskip.rainbow.editor.map
 								
 								
 								var fSourceBMD:BitmapData = BitmapData(GlobalData.IMAGE_SPARK_PLUS.bitmapData);
-								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL,true);
+								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL,true,0x00000000);
 								
 								fBitmapData.draw(fSourceBMD,_matrix);
 								
@@ -490,8 +489,16 @@ package com.xskip.rainbow.editor.map
 								fValues.image.x = fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
 								fValues.image.y = fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
 								
-								//随即加一个文件名
-								fValues.filename=String(Math.floor(Math.random()*300+20));
+								//路径
+								fValues.path = GlobalData.IMAGE_SPARK_PLUS.path;
+								//文件名
+								fValues.filename = GlobalData.IMAGE_SPARK_PLUS.fileName;
+								
+								fValues.width = GlobalData.IMAGE_SPARK_PLUS.baseWidth;
+								fValues.height = GlobalData.IMAGE_SPARK_PLUS.baseHeight;
+								
+								fValues.layer = GlobalData.SELECTED_LAYER;
+								
 								
 								//fValues.image=fImage;
 								

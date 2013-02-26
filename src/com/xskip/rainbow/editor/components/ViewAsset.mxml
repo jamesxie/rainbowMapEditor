@@ -11,6 +11,7 @@
 			import com.xskip.rainbow.editor.event.EventCenter;
 			import com.xskip.rainbow.editor.event.EventType;
 			import com.xskip.rainbow.editor.event.JEvent;
+			import com.xskip.utils.FileUtil;
 			import com.xskip.utils.ImageSparkPlus;
 			import com.xskip.utils.StringUtil;
 			
@@ -166,14 +167,22 @@
 						trace("过滤目录");
 					}else{
 						//trace(fTempFile.name);
-						var fImage:Image=new Image();
+						
+						var fImage:ImageSparkPlus=new ImageSparkPlus();
 						//trace("fTempFile.data "+fTempFile.data);
 						
 						//var myBitmap:Bitmap = new Bitmap(BitmapData(fTempFile.data));
 						
 						//.icon.bitmaps[0] );
 						//fImage.source = "{File(userDirFiles[i]).data}";
-						fImage.source = fTempFile.nativePath;
+						
+						var fPath:String=fTempFile.nativePath;
+						
+						
+						fImage.path = FileUtil.getDirectory(fPath);
+						fImage.fileName = FileUtil.getFileName(fPath);
+						
+						fImage.source = fPath;
 						
 						fImage.addEventListener(MouseEvent.MOUSE_DOWN,onImageDownHandler);
 						//fImage.x = 5;
@@ -204,8 +213,13 @@
 			
 			private function onImageDownHandler(e:MouseEvent):void{
 				
+				var fImage:ImageSparkPlus=ImageSparkPlus(e.currentTarget);
+				
+				
 				//方法一 选择图片
-				selectImage(Image(e.currentTarget),e.localX,e.localY);
+				selectImage(fImage,e.localX,e.localY);
+				
+				//trace("fImage = "+fImage);
 				
 				//XXX 方法二 拖拽图片 已经不再使用
 				//dragImage(Image(e.currentTarget),e.localX,e.localY);
@@ -213,14 +227,14 @@
 			}
 			
 			
-			private function selectImage(pImage:Image,x:Number,y:Number):void{
+			private function selectImage(pImage:ImageSparkPlus,x:Number,y:Number):void{
 				//trace("selectImage");
 				
 				_imageDragFixX = x;
 				_imageDragFixY = y;
 				
 				if (pImage){
-					var fImage:Image=pImage;
+					var fImage:ImageSparkPlus=pImage;
 					
 					FlexGlobals.topLevelApplication.addElement(_imageDrag);
 					
@@ -238,6 +252,9 @@
 						_changeImage2.height = bd.height;
 						_changeImage2.source = fBitmap;
 						
+						_changeImage2.path=pImage.path;
+						_changeImage2.fileName=pImage.fileName;
+						
 						//(如果隐藏)强制显示
 						_changeImage2.visible = true;
 					}
@@ -247,6 +264,7 @@
 				}
 			}
 			
+			//不再使用此方法
 			private function dragImage(pImage:Image,x:Number,y:Number):void{
 				trace("dragImage");
 				
@@ -384,7 +402,7 @@
 						horizontalCenter="0" verticalCenter="0" top="180">
 				
 
-				
+				<!--目录中的图片-->
 				<s:VGroup id="fileAssetView" top="0" x="0" y="0" width="100%" height="100%">
 				</s:VGroup>
 				
