@@ -467,7 +467,21 @@ package com.xskip.rainbow.editor.map
 								
 								
 								var fSourceBMD:BitmapData = BitmapData(GlobalData.IMAGE_SPARK_PLUS.bitmapData);
-								var fBitmapData:BitmapData = new BitmapData(GlobalData.WIDTH_TILE_PIXEL,GlobalData.HEIGHT_TILE_PIXEL,true,0x00000000);
+								
+								
+								fValues.type = getXMLTypeData();
+								
+								var fWidth:int=GlobalData.WIDTH_TILE_PIXEL;
+								var fHeight:int=GlobalData.HEIGHT_TILE_PIXEL;
+								
+								if (fValues.type==TileValues.TYPE_ABSOLUTE_POSITION){
+									fWidth = GlobalData.IMAGE_SPARK_PLUS.bitmapData.width;
+									fHeight = GlobalData.IMAGE_SPARK_PLUS.bitmapData.height;
+								}
+								
+								
+								var fBitmapData:BitmapData = new BitmapData(fWidth,fHeight,true,0x00000000);
+								
 								
 								fBitmapData.draw(fSourceBMD,_matrix);
 								
@@ -486,6 +500,11 @@ package com.xskip.rainbow.editor.map
 								
 								//var fImage:Image = new Image(fTexture);
 								
+								//布局类型 0为网格分布 1为自由分布
+								
+								
+								
+								
 								fValues.image.x = fPoint.x * GlobalData.WIDTH_TILE_PIXEL;
 								fValues.image.y = fPoint.y * GlobalData.HEIGHT_TILE_PIXEL;
 								
@@ -501,6 +520,10 @@ package com.xskip.rainbow.editor.map
 								
 								fValues.x = fPoint.x;
 								fValues.y = fPoint.y;
+								
+								fValues.direction = GlobalData.IMAGE_Direction;
+								
+								
 								
 								//fValues.image=fImage;
 								
@@ -539,6 +562,22 @@ package com.xskip.rainbow.editor.map
 				}
 				
 			}
+		}
+		
+		private function getXMLTypeData():String{
+			var fStr:String=TileValues.TYPE_TILE;
+			switch(GlobalData.SELECTED_LAYER){
+				case GlobalData.LAYER_BACKGROUND:
+				case GlobalData.LAYER_BACKGROUND_SCROLL_01:
+				case GlobalData.LAYER_BACKGROUND_SCROLL_02:
+				case GlobalData.LAYER_FLOOR_BACKGROUND:
+				case GlobalData.LAYER_FLOOR_GARDEN:
+				case GlobalData.LAYER_FLOOR_BACKGROUND:
+					fStr = TileValues.TYPE_ABSOLUTE_POSITION;
+					break;
+				default:
+			}
+			return fStr;
 		}
 
 		public function get mouseX():Number

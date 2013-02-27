@@ -354,6 +354,8 @@
 					}
 					fViewLayer.selectEdit(true);
 					layer_LAYER_TILE_CELL.label="图层" + "【" + fViewLayer.layerName.label + "】";
+					
+					GlobalData.SELECTED_LAYER = fViewLayer.key;
 				}
 			}
 

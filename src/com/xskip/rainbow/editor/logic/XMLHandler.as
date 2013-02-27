@@ -3,6 +3,7 @@ package com.xskip.rainbow.editor.logic
 	import com.xskip.rainbow.editor.data.GlobalData;
 	import com.xskip.rainbow.editor.data.TileValues;
 	import com.xskip.utils.HashMap;
+	import com.xskip.utils.StringUtil;
 	
 	import flash.events.Event;
 	import flash.filesystem.File;
@@ -51,7 +52,7 @@ package com.xskip.rainbow.editor.logic
 				var fKey:String = fHM_DATA.keys()[i];
 				var fTileValues:TileValues=TileValues(fHM_DATA.getValue(fKey));
 
-				fContents+="\t<config layer='"+fTileValues.layer+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
+				fContents+="\t<config layer='"+fTileValues.layer+"' type='"+fTileValues.type+"' direction='"+0+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
 					"width='"+fTileValues.width+"' " +
 					"height='"+fTileValues.height+"' " +
 					"path='"+fTileValues.path+"' " +
@@ -87,7 +88,7 @@ package com.xskip.rainbow.editor.logic
 			
 			var file:File = new File(path);
 			
-			file = file.resolvePath("xml/saveFile.xml");
+			file = file.resolvePath("xml/saveFile"+StringUtil.GetFullTime("_","-","")+".xml");
 			
 			var stream:FileStream = new FileStream();
 			

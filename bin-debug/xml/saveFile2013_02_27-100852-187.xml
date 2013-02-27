@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<root>
+	<config layer='LAYER_FLOOR' x='19' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='20' y='21' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='17' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='18' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='14' y='16' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='16' y='18' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='16' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='20' y='19' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='20' y='20' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='18' y='21' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='21' y='19' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='15' y='20' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='16' y='20' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='19' y='19' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='17' y='21' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='20' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='21' y='20' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' x='17' y='20' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+</root>

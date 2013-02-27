@@ -7,6 +7,10 @@ package com.xskip.rainbow.editor.data
 		
 		private var _layer:String;
 		
+		private var _type:String;
+		
+		private var _direction:Number;
+		
 		private var _x:Number;
 		private var _y:Number;
 		
@@ -18,6 +22,10 @@ package com.xskip.rainbow.editor.data
 		
 		private var _image:Image;
 		
+		//基于网格
+		public static const TYPE_TILE:String="0";
+		//基于绝对位置
+		public static const TYPE_ABSOLUTE_POSITION:String="1";
 		
 		public function TileValues()
 		{
@@ -26,6 +34,10 @@ package com.xskip.rainbow.editor.data
 		
 		private function init():void{
 			_layer="";
+			
+			_type=TYPE_TILE;
+			_direction=0;
+			
 			_x=0;
 			_y=0;
 			_width=0;
@@ -63,6 +75,22 @@ package com.xskip.rainbow.editor.data
 		
 		public function get layer():String{
 			return _layer;
+		}
+		
+		public function set type(str:String):void{
+			_type = str;
+		}
+		
+		public function get type():String{
+			return _type;
+		}
+		
+		public function set direction(num:Number):void{
+			_direction = num;
+		}
+		
+		public function get direction():Number{
+			return _direction;
 		}
 		
 		
