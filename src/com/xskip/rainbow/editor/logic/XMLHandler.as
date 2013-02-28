@@ -48,11 +48,14 @@ package com.xskip.rainbow.editor.logic
 			var fHM_DATA:HashMap = GlobalData.SAVE_DATA;
 			var fLength:int = fHM_DATA.size();
 			
+			//排序
+			fHM_DATA.sortByKey();
+			
 			for (var i:int = 0;i < fLength;i++){
 				var fKey:String = fHM_DATA.keys()[i];
 				var fTileValues:TileValues=TileValues(fHM_DATA.getValue(fKey));
 
-				fContents+="\t<config layer='"+fTileValues.layer+"' type='"+fTileValues.type+"' direction='"+0+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
+				fContents+="\t<config layer='"+fTileValues.layer+"' type='"+fTileValues.type+"' direction='"+fTileValues.direction+"' x='"+fTileValues.x+"' y='"+fTileValues.y+"' " +
 					"width='"+fTileValues.width+"' " +
 					"height='"+fTileValues.height+"' " +
 					"path='"+fTileValues.path+"' " +

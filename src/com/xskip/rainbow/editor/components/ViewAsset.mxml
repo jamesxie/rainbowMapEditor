@@ -26,11 +26,12 @@
 			
 			private var _isRun:Boolean;
 			private var _assetPath:String;
-			private var _imageDrag:Image;
-			private var _imageDragFixX:int;
-			private var _imageDragFixY:int;
-			private var _onDrag:Boolean;
-			private var _callBack:Function;
+			//private var _imageDrag:Image;
+			//private var _imageDragFixX:int;
+			//private var _imageDragFixY:int;
+			//private var _onDrag:Boolean;
+			
+			//private var _callBack:Function;
 			
 			private var _changeImage:Image;
 			private var _changeImage2:ImageSparkPlus;
@@ -48,9 +49,11 @@
 				_navigatorContent = pTarget;
 			}
 			
+			/*
 			public function start(pFun:Function):void {
 				_callBack = pFun;
 			}
+			*/
 			
 			protected function initHandler(event:FlexEvent):void
 			{
@@ -59,12 +62,12 @@
 				_assetPath = "";
 				
 				//拖动素材
-				_imageDrag = new Image();
+				/*_imageDrag = new Image();
 				_imageDrag.alpha = 0.3;
 				_imageDrag.mouseEnabled = false;
 				_onDrag = false;
 				_imageDragFixX = 0;
-				_imageDragFixY = 0;
+				_imageDragFixY = 0;*/
 				//_imageDrag.visible = false;
 				
 				//
@@ -230,13 +233,13 @@
 			private function selectImage(pImage:ImageSparkPlus,x:Number,y:Number):void{
 				//trace("selectImage");
 				
-				_imageDragFixX = x;
-				_imageDragFixY = y;
+				//_imageDragFixX = x;
+				//_imageDragFixY = y;
 				
 				if (pImage){
 					var fImage:ImageSparkPlus=pImage;
 					
-					FlexGlobals.topLevelApplication.addElement(_imageDrag);
+					//FlexGlobals.topLevelApplication.addElement(_imageDrag);
 					
 					var bd:BitmapData = new BitmapData(fImage.width,fImage.height);
 					bd = fImage.bitmapData.clone();
@@ -252,11 +255,13 @@
 						_changeImage2.height = bd.height;
 						_changeImage2.source = fBitmap;
 						
-						_changeImage2.path=pImage.path;
-						_changeImage2.fileName=pImage.fileName;
+						_changeImage2.path = pImage.path;
+						_changeImage2.fileName = pImage.fileName;
 						
 						//(如果隐藏)强制显示
 						_changeImage2.visible = true;
+						
+						GlobalData.IMAGE_Direction = 0;
 					}
 					
 				}else{
@@ -264,6 +269,7 @@
 				}
 			}
 			
+			/*
 			//不再使用此方法
 			private function dragImage(pImage:Image,x:Number,y:Number):void{
 				trace("dragImage");
@@ -316,6 +322,7 @@
 				}
 			}
 			
+			
 			private function onImageMoveHandler(e:MouseEvent):void{
 				updateImageDragXY();
 			}
@@ -349,6 +356,7 @@
 				
 				FlexGlobals.topLevelApplication.removeElement(_imageDrag);
 			}
+			*/
 			
 			private function isPic(element:*,index:int,arr:Array):Boolean{
 				//过滤文件夹的文件，将指定格式的图片挑出来

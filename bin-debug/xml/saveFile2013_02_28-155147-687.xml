@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<root>
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='22' y='11' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='14' y='11' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='13' y='11' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='12' y='11' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+</root>

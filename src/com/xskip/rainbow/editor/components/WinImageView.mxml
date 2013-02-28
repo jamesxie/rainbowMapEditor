@@ -19,6 +19,21 @@
 			private function init():void{
 				this.isPopUp = true;
 				addEventListener(CloseEvent.CLOSE, titleWindow_close);
+				
+				
+				GlobalData.STAGE.addEventListener(KeyboardEvent.KEY_UP,onKeyUpHandler);
+			}
+			
+			
+			private function onKeyUpHandler(e:KeyboardEvent):void {
+				//trace("e.keyCode = "+e.keyCode);
+				
+				//press E key
+				if (e.keyCode==69){
+					GlobalData.MODE_EDIT=!GlobalData.MODE_EDIT;
+					editColorRect.visible=GlobalData.MODE_EDIT;
+					editTxt.visible=GlobalData.MODE_EDIT;
+				}
 			}
 			
 			private function titleWindow_close(e:CloseEvent):void{
@@ -123,7 +138,7 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:BorderContainer x="0" y="0" width="200" height="200" backgroundColor="0x006600">
+	<s:BorderContainer x="0" y="0" width="200" height="200" backgroundColor="0xFFFFFF">
 		<s:Image id="image_view" x="10" y="10" width="128" height="128" visible="false"/>
 		<utils:ImageSparkPlus id="image_view_shadow" x="10" y="10" width="128" height="128" visible="false"/>
 		<s:Button id="btn_clear" x="146" y="116" label="Ｃ" width="32" height="20" toolTip="橡皮" click="onBtnClearHandler(event);"/>
@@ -132,5 +147,18 @@
 		<s:HSlider id="move_w" x="10" y="170" width="150"/>
 		<s:VSlider id="move_h" x="184" y="30" height="150"/>
 		<s:Label id="txt_direction" x="149" y="87" text="↑" fontSize="12" width="27" verticalAlign="middle"/>
+		
+		<s:Rect id="editColorRect"
+				alpha="1"
+				x="0"
+				y="0"
+				width="200"
+				height="200" visible="false">
+			<s:fill>
+				<s:SolidColor color="0xFFFFFF"/>
+			</s:fill>
+		</s:Rect>
+		<s:Label id="editTxt" x="59" y="76" text="EDIT" fontSize="36" fontFamily="Arial" fontWeight="bold" visible="false"/>
+		
 	</s:BorderContainer>
 </s:Group>

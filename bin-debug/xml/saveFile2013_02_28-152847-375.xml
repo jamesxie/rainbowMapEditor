@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<root>
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='12' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='14' y='10' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='14' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='17' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='13' y='10' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='12' y='10' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='16' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='18' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='20' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles3.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='11' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles1.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='15' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='13' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='0' x='19' y='15' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='floor_tiles2.png' />
+	<config layer='LAYER_FLOOR' type='0' direction='90' x='16' y='10' width='16' height='16' path='K:\GitHub\rainbowMapEditor\bin-debug\assets\tiles\16\' filename='normal_tiles4.png' />
+</root>

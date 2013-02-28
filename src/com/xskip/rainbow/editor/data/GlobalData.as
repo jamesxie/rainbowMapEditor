@@ -41,6 +41,9 @@ package com.xskip.rainbow.editor.data
 		//笔刷（内容有或无）
 		public static var IMAGE_SPARK_PLUS:ImageSparkPlus;
 		
+		//编辑模式 可以移动素材
+		public static var MODE_EDIT:Boolean = false;
+		
 		//---------------- 数据变量 ----------------
 		
 		public static var DATA_READY:Boolean = false;
